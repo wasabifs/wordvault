@@ -819,15 +819,25 @@ async function doTranslate(){
   result.style.display='none';
 
   const w=word.toLowerCase();
-  if(DC[w]){applyTrans(DC[w]);btn.classList.remove('loading');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> 翻譯';btn.disabled=false;return;}
 
   try{
-    const res=await fetch('/.netlify/functions/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word:w,type:etab})});
-    if(!res.ok)throw new Error();
-    const r=await res.json();
-    if(r.error)throw new Error();
-    r.examples=Array.isArray(r.examples)?r.examples:[];
-    DC[w]=r;applyTrans(r);
+    let r=DC[w];
+    if(!r){
+      const res=await fetch('/.netlify/functions/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word:w,type:etab})});
+      if(!res.ok)throw new Error();
+      r=await res.json();
+      if(r.error)throw new Error();
+      r.examples=Array.isArray(r.examples)?r.examples:[];
+      DC[w]=r;
+    }
+    applyTrans(r);
+
+    // After filling English examples, translate each one to Chinese inline
+    if(r.examples?.length){
+      const g=etab==='phrase'?'phrase-examples':'vocab-examples';
+      const textareas=document.querySelectorAll(`#${g} textarea`);
+      translateExamplesInline(r.examples, textareas);
+    }
   }catch{
     try{
       const mm=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh-TW`);
@@ -840,8 +850,34 @@ async function doTranslate(){
   }
 
   btn.classList.remove('loading');
-  btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> 翻譯';
+  btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> 重新翻譯';
   btn.disabled=false;
+}
+
+async function translateExamplesInline(examples, textareas){
+  // Translate each English example and append Chinese below in the textarea placeholder area
+  // We show Chinese as a hint below each textarea using a sibling element
+  const g = etab==='phrase'?'phrase-examples':'vocab-examples';
+  const rows = document.querySelectorAll(`#${g} .example-row`);
+
+  for(let i=0;i<examples.length&&i<rows.length;i++){
+    // Remove existing hint if any
+    const existing = rows[i].querySelector('.example-zh-hint');
+    if(existing) existing.remove();
+
+    try{
+      const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(examples[i])}&langpair=en|zh-TW`);
+      const j=await res.json();
+      const zh=j?.responseData?.translatedText||'';
+      if(zh){
+        const hint=document.createElement('div');
+        hint.className='example-zh-hint';
+        hint.style.cssText='font-size:11px;color:var(--muted);margin-top:3px;padding-left:0;line-height:1.5;font-style:italic;';
+        hint.textContent=zh;
+        rows[i].appendChild(hint);
+      }
+    }catch{}
+  }
 }
 
 function applyTrans(r){

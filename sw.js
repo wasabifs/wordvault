@@ -1,4 +1,4 @@
-const CACHE = 'wordvault-v1';
+const CACHE = 'wordvault-v2';
 const ASSETS = [
   './index.html',
   './manifest.json',
