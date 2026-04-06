@@ -399,8 +399,35 @@ body{
 .install-btn{font-size:12px;padding:4px 12px;background:var(--accent);color:white;border:none;border-radius:99px;cursor:pointer;font-weight:500;}
 .install-close{font-size:18px;color:var(--muted);cursor:pointer;background:none;border:none;}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.word-card,.list-card{animation:fadeUp 0.18s ease both;}
+/* ── Familiarity filter tabs ── */
+.filter-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{flex-shrink:0;padding:5px 14px;border-radius:99px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;}
+.filter-tab.active{background:var(--ink);color:white;border-color:var(--ink);}
+.filter-tab.f-unknown.active{background:#ff6b6b;border-color:#ff6b6b;}
+.filter-tab.f-known.active{background:#f0b429;border-color:#f0b429;color:white;}
+.filter-tab.f-mastered.active{background:var(--green-dark);border-color:var(--green-dark);}
+
+/* ── Familiarity badge on card ── */
+.fam-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.fam-dot.unknown{background:#ff6b6b;}
+.fam-dot.known{background:#f0b429;}
+.fam-dot.mastered{background:var(--green);}
+
+/* ── Card bg by familiarity ── */
+.word-card.fam-unknown,.list-card.fam-unknown{background:#fff5f5;}
+.word-card.fam-known,.list-card.fam-known{background:#fffbea;}
+
+/* ── Familiarity picker in modal ── */
+.fam-picker{display:flex;gap:6px;}
+.fam-tag{flex:1;padding:8px 4px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);text-align:center;transition:all 0.12s;}
+.fam-tag.active-unknown{background:#fff0f0;border-color:#ff6b6b;color:#c0392b;}
+.fam-tag.active-known{background:#fffbea;border-color:#f0b429;color:#8a5a00;}
+.fam-tag.active-mastered{background:var(--green-light);border-color:var(--green);color:var(--green-dark);}
+
+/* ── Calendar always visible in quiz setup ── */
+.cal-always{margin-top:16px;}
+
 </style>
 </head>
 <body>
@@ -440,6 +467,12 @@ body{
       </div>
       <input id="search-input" placeholder="搜尋..." oninput="renderList()">
     </div>
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all')">全部</button>
+      <button class="filter-tab f-unknown" onclick="setFilter('unknown')">陌生</button>
+      <button class="filter-tab f-known" onclick="setFilter('known')">認識</button>
+      <button class="filter-tab f-mastered" onclick="setFilter('mastered')">熟悉</button>
+    </div>
   </div>
 
   <!-- Scroll content -->
@@ -467,11 +500,28 @@ body{
         <div style="padding:4px 0 18px"><div style="font-size:22px;font-weight:700;color:var(--ink);margin-bottom:3px">隨堂測驗</div><div style="font-size:14px;color:var(--muted)">從學習內容中自動出題</div></div>
         <div class="quiz-config">
           <div class="config-row"><span class="config-label">題目範圍</span><select class="config-select" id="quiz-scope"><option value="all">全部類別</option><option value="vocab">只考單字</option><option value="phrase">只考片語</option></select></div>
+          <div class="config-row"><span class="config-label">熟悉度</span><select class="config-select" id="quiz-fam"><option value="all">全部</option><option value="unknown">陌生</option><option value="known">認識</option><option value="mastered">熟悉</option></select></div>
           <div class="config-row"><span class="config-label">題型</span><select class="config-select" id="quiz-type"><option value="choice">選擇題</option><option value="fill">填空題</option><option value="mixed">混合</option></select></div>
           <div class="config-row"><span class="config-label">題目方向</span><select class="config-select" id="quiz-direction"><option value="en2zh">英文 → 中文</option><option value="zh2en">中文 → 英文</option></select></div>
           <div class="config-row"><span class="config-label">出題數量</span><select class="config-select" id="quiz-count"><option value="5">5 題</option><option value="10" selected>10 題</option><option value="15">15 題</option><option value="all">全部</option></select></div>
         </div>
         <button class="btn-start" onclick="startQuiz()">開始測驗</button>
+        <!-- Calendar always visible -->
+        <div class="cal-always">
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calPrev()">‹</button>
+              <div class="cal-title-row">
+                <div class="cal-title" id="cal-month-label"></div>
+                <div class="cal-streak" id="cal-streak" style="display:none"></div>
+              </div>
+              <button class="cal-nav" onclick="calNext()">›</button>
+            </div>
+            <div class="cal-weekdays"><div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div><div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div><div class="cal-weekday">六</div></div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-note" id="cal-note"></div>
+          </div>
+        </div>
       </div>
       <div id="quiz-active-area" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -491,19 +541,6 @@ body{
           <div style="font-size:13px;color:var(--muted)" id="result-sub"></div>
         </div>
         <div id="result-list"></div>
-        <div class="cal-wrap">
-          <div class="cal-header">
-            <button class="cal-nav" onclick="calPrev()">‹</button>
-            <div class="cal-title-row">
-              <div class="cal-title" id="cal-month-label"></div>
-              <div class="cal-streak" id="cal-streak" style="display:none"></div>
-            </div>
-            <button class="cal-nav" onclick="calNext()">›</button>
-          </div>
-          <div class="cal-weekdays"><div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div><div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div><div class="cal-weekday">六</div></div>
-          <div class="cal-grid" id="cal-grid"></div>
-          <div class="cal-note" id="cal-note"></div>
-        </div>
         <button class="btn-start" style="margin-top:16px" onclick="endQuiz()">再測一次</button>
       </div>
     </div>
@@ -592,6 +629,7 @@ body{
         </div>
       </div>
       <div class="field"><div class="field-label">個人筆記（選填）</div><textarea class="field-textarea" id="input-note" rows="2" placeholder="在哪裡看到？有什麼聯想？..."></textarea></div>
+      <div class="field"><div class="field-label">熟悉度</div><div class="fam-picker"><span class="fam-tag" onclick="pickFam(this,'unknown')">陌生</span><span class="fam-tag" onclick="pickFam(this,'known')">認識</span><span class="fam-tag" onclick="pickFam(this,'mastered')">熟悉</span></div></div>
     </div>
     <div class="btn-row">
       <button class="btn-primary" onclick="saveEntry()">儲存</button>
@@ -649,10 +687,37 @@ function seed(){
   ];
 }
 
-let tab='vocab',eid=null,etab=null;
+let tab='vocab',eid=null,etab=null,filterFam='all';
+
+function setFilter(f){
+  filterFam=f;
+  document.querySelectorAll('.filter-tab').forEach(t=>{
+    t.classList.remove('active');
+    if(t.textContent==='全部'&&f==='all')t.classList.add('active');
+    if(t.textContent==='陌生'&&f==='unknown')t.classList.add('active');
+    if(t.textContent==='認識'&&f==='known')t.classList.add('active');
+    if(t.textContent==='熟悉'&&f==='mastered')t.classList.add('active');
+  });
+  renderList();
+}
+
+function pickFam(el,val){
+  document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
+  el.classList.add('active-'+val);
+  el.dataset.val=val;
+}
+
+function getSelectedFam(){
+  const el=document.querySelector('.fam-tag.active-unknown,.fam-tag.active-known,.fam-tag.active-mastered');
+  if(!el)return'';
+  if(el.classList.contains('active-unknown'))return'unknown';
+  if(el.classList.contains('active-known'))return'known';
+  if(el.classList.contains('active-mastered'))return'mastered';
+  return'';
+}
 
 function switchTab(t,l){
-  tab=t;
+  tab=t;filterFam='all';
   ['vocab','phrase','grammar','pattern','quiz'].forEach(x=>{
     document.getElementById('page-'+x).style.display=x===t?'block':'none';
     const tb=document.getElementById('tab-'+x);
@@ -662,6 +727,8 @@ function switchTab(t,l){
   document.getElementById('page-title').textContent=l||'WordVault';
   document.getElementById('fab').style.display='flex';
   document.getElementById('search-bar').style.display='block';
+  document.getElementById('filter-tabs').style.display='flex';
+  document.querySelectorAll('.filter-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
   document.getElementById('scroll-area').scrollTop=0;
   renderList();
 }
@@ -675,7 +742,10 @@ function switchQuiz(){
   document.getElementById('page-title').textContent='測驗';
   document.getElementById('fab').style.display='none';
   document.getElementById('search-bar').style.display='none';
+  document.getElementById('filter-tabs').style.display='none';
   endQuiz();
+  // Init calendar immediately
+  calVY=undefined;calVM=undefined;renderCal();
 }
 
 function openDetail(t,id){
@@ -684,6 +754,7 @@ function openDetail(t,id){
   document.getElementById('page-detail').style.display='block';
   document.getElementById('fab').style.display='none';
   document.getElementById('search-bar').style.display='none';
+  document.getElementById('filter-tabs').style.display='none';
   const labels={vocab:'単字',phrase:'片語',grammar:'文法',pattern:'句型'};
   const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
 
@@ -730,6 +801,7 @@ function goHome(){
   const titleRow=document.querySelector('.topbar-title-row');
   const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
   titleRow.innerHTML=`<span class="topbar-title" id="page-title">${lb[tab]||'WordVault'}</span>`;
+  document.getElementById('filter-tabs').style.display='flex';
   switchTab(tab,lb[tab]);
 }
 
@@ -742,17 +814,21 @@ function renderList(){
     pattern:{g:'pattern-list',e:'empty-pattern'}
   };
   const cfg=cfgs[tab];if(!cfg)return;
-  const items=(window._d[tab]||[]).filter(i=>!q||i.en.toLowerCase().includes(q)||(i.zh||'').includes(q));
+  let items=(window._d[tab]||[]).filter(i=>!q||i.en.toLowerCase().includes(q)||(i.zh||'').includes(q));
+  if(filterFam!=='all')items=items.filter(i=>(i.fam||'unknown')===filterFam);
+
+  const famClass=(f)=>f==='known'?'fam-known':f==='mastered'?'fam-mastered':'fam-unknown';
+
   if(cfg.grid){
     document.getElementById(cfg.g).innerHTML=items.map((item,idx)=>`
-      <div class="word-card" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
+      <div class="word-card ${famClass(item.fam||'unknown')}" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
         <div class="word-en">${esc(item.en)}</div>
         <div class="word-zh">${esc(item.zh)}</div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
       </div>`).join('');
   }else{
     document.getElementById(cfg.g).innerHTML=items.map((item,idx)=>`
-      <div class="list-card" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
+      <div class="list-card ${famClass(item.fam||'unknown')}" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
         <div class="list-card-body"><div class="list-en">${esc(item.en)}</div><div class="list-zh">${esc(item.zh)}</div></div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
       </div>`).join('');
@@ -771,6 +847,7 @@ function openAddModal(){
   document.getElementById('trans-result').textContent='';
   document.getElementById('modal-del-btn').style.display='none';
   document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
   setModalMode(tab);clearEx();
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('input-en').focus(),350);
@@ -788,6 +865,11 @@ function openEditModal(t,id){
   document.getElementById('trans-result').style.display='none';
   document.getElementById('modal-del-btn').style.display='block';
   document.querySelectorAll('.pos-tag').forEach(x=>x.classList.toggle('active',x.textContent===(item.pos||'')));
+  // Set familiarity
+  document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
+  const fam=item.fam||'unknown';
+  const famEl=document.querySelector(`.fam-tag:nth-child(${fam==='unknown'?1:fam==='known'?2:3})`);
+  if(famEl)famEl.classList.add('active-'+fam);
   setModalMode(t);
   const exArr=Array.isArray(item.examples)?item.examples:(item.example?[item.example]:[]);
   fillEx(t,exArr);
@@ -904,9 +986,10 @@ function saveEntry(){
   const ant=document.getElementById('input-ant').value.trim();
   const examples=getEx(etab);
   const note=document.getElementById('input-note').value.trim();
+  const fam=getSelectedFam()||'unknown';
   const now=Date.now();
-  if(eid){const arr=window._d[etab];const i=arr.findIndex(x=>x.id===eid);if(i>=0)arr[i]={...arr[i],en,zh,pos,syn,ant,examples,note,updatedAt:now};showToast('已更新');}
-  else{if(!window._d[etab])window._d[etab]=[];window._d[etab].unshift({id:uid(),en,zh,pos,syn,ant,examples,note,createdAt:now});showToast('已新增');}
+  if(eid){const arr=window._d[etab];const i=arr.findIndex(x=>x.id===eid);if(i>=0)arr[i]={...arr[i],en,zh,pos,syn,ant,examples,note,fam,updatedAt:now};showToast('已更新');}
+  else{if(!window._d[etab])window._d[etab]=[];window._d[etab].unshift({id:uid(),en,zh,pos,syn,ant,examples,note,fam,createdAt:now});showToast('已新增');}
   save();document.getElementById('overlay').classList.remove('open');
   if(eid)openDetail(etab,eid);else renderList();
 }
@@ -914,7 +997,16 @@ function deleteEntry(){if(!eid||!confirm('確定刪除？'))return;window._d[eta
 
 // ── Quiz ──
 let qi=[],qx=0,qs=0,qr=[],qt='choice',qd='en2zh',ans=false;
-function allItems(){const sc=document.getElementById('quiz-scope').value;if(sc==='vocab')return(window._d.vocab||[]).map(i=>({...i,_t:'vocab'}));if(sc==='phrase')return(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}));return[...(window._d.vocab||[]).map(i=>({...i,_t:'vocab'})),...(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}))];};
+function allItems(){
+  const sc=document.getElementById('quiz-scope').value;
+  const fam=document.getElementById('quiz-fam').value;
+  let items=[];
+  if(sc==='vocab')items=(window._d.vocab||[]).map(i=>({...i,_t:'vocab'}));
+  else if(sc==='phrase')items=(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}));
+  else items=[...(window._d.vocab||[]).map(i=>({...i,_t:'vocab'})),...(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}))];
+  if(fam!=='all')items=items.filter(i=>(i.fam||'unknown')===fam);
+  return items;
+};;
 function startQuiz(){const a=allItems();if(a.length<2){showToast('至少需要 2 筆學習內容');return;}qd=document.getElementById('quiz-direction').value;qt=document.getElementById('quiz-type').value;const cv=document.getElementById('quiz-count').value;const mx=cv==='all'?a.length:parseInt(cv);qi=[...a].sort(()=>Math.random()-0.5).slice(0,Math.min(mx,a.length));qx=0;qs=0;qr=[];document.getElementById('quiz-setup-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-active-area').style.display='block';renderQP();showQ();}
 function renderQP(){document.getElementById('quiz-progress').innerHTML=qi.map((_,i)=>`<div class="progress-dot ${i<qx?'done':i===qx?'current':''}"></div>`).join('');}
 function showQ(){ans=false;const item=qi[qx];document.getElementById('quiz-counter').textContent=`第 ${qx+1} 題 / ${qi.length}`;const ic=qt==='mixed'?Math.random()>0.5:qt==='choice';document.getElementById('quiz-prompt').textContent=qd==='en2zh'?'這個英文的中文意思是？':'這個中文對應的英文是？';document.getElementById('quiz-word').textContent=qd==='en2zh'?item.en:item.zh;document.getElementById('quiz-hint').textContent=qd==='en2zh'&&item.pos?item.pos:'';document.getElementById('quiz-feedback').style.display='none';document.getElementById('btn-next').style.display='none';const area=document.getElementById('quiz-answer-area');if(ic){const opts=[...allItems().filter(i=>i.id!==item.id).sort(()=>Math.random()-0.5).slice(0,3),item].sort(()=>Math.random()-0.5);area.innerHTML=`<div class="quiz-options">${opts.map(o=>`<button class="quiz-option" onclick="checkC(this,'${o.id}','${item.id}')">${esc(qd==='en2zh'?o.zh:o.en)}</button>`).join('')}</div>`;}else{area.innerHTML=`<input class="fill-input" id="fill-input" placeholder="${qd==='en2zh'?'輸入中文意思...':'輸入英文...'}" onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>`;setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);}}
@@ -922,7 +1014,7 @@ function checkC(btn,oid,cid){if(ans)return;ans=true;const ok=oid===cid;document.
 function checkF(){if(ans)return;const inp=document.getElementById('fill-input');if(!inp)return;ans=true;const ua=inp.value.trim().toLowerCase();const item=qi[qx];const cor=(qd==='en2zh'?item.zh:item.en).toLowerCase();const ok=ua===cor||(cor.includes(ua)&&ua.length>2);inp.classList.add(ok?'correct':'wrong');inp.disabled=true;showFB(ok,item);}
 function showFB(ok,item){if(ok)qs++;qr.push({item,correct:ok});const fb=document.getElementById('quiz-feedback');fb.style.display='block';fb.className='quiz-feedback '+(ok?'correct':'wrong');fb.textContent=ok?'答對了！':`正確答案：${qd==='en2zh'?item.zh:item.en}`;const bn=document.getElementById('btn-next');bn.style.display='block';bn.textContent=qx<qi.length-1?'下一題 →':'查看結果 →';}
 function nextQuestion(){qx++;if(qx>=qi.length)showResult();else{renderQP();showQ();}}
-function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:13px;font-weight:600;color:${r.correct?'var(--green-dark)':'var(--red)'}">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();calVY=undefined;calVM=undefined;renderCal();}
+function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:13px;font-weight:600;color:${r.correct?'var(--green-dark)':'var(--red)'}">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();renderCal();}
 
 // ── Calendar ──
 let calVY,calVM;
@@ -956,7 +1048,7 @@ function renderCal(){
 }
 function calPrev(){if(calVM===undefined)return;calVM--;if(calVM<0){calVM=11;calVY--;}renderCal();}
 function calNext(){if(calVM===undefined)return;const now=new Date();if(calVY===now.getFullYear()&&calVM===now.getMonth())return;calVM++;if(calVM>11){calVM=0;calVY++;}renderCal();}
-function endQuiz(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-setup-area').style.display='block';calVY=undefined;calVM=undefined;}
+function endQuiz(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-setup-area').style.display='block';renderCal();}
 
 // ── PWA ──
 let dp=null;
