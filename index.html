@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="WordVault">
@@ -27,268 +27,380 @@
   --green-light:#e8f8ec;
   --red:#ff3b30;
   --red-light:#fff0ee;
-  --amber:#ff9500;
-  --amber-light:#fff8ec;
+  --orange:#ff9500;
+  --orange-light:#fff3e0;
   --teal:#5ac8fa;
   --teal-light:#eaf7fd;
   --r:12px;
   --r-sm:8px;
-  --r-xs:6px;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  --safe-left:env(safe-area-inset-left,0px);
-  --safe-right:env(safe-area-inset-right,0px);
-  --tab-h:calc(56px + var(--safe-bottom));
+  --tab-h:calc(52px + var(--safe-bottom));
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overscroll-behavior:none;}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;-webkit-font-smoothing:antialiased;}
 
-/* ── App shell ── */
-.app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;}
+/* ── Reset & lock viewport ── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{
+  height:100%;
+  overflow:hidden;
+  position:fixed;
+  width:100%;
+  touch-action:pan-y;
+}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  height:100%;
+  overflow:hidden;
+  position:fixed;
+  width:100%;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* ── App shell: full screen, fixed ── */
+.app{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  max-width:430px;
+  margin:0 auto;
+  background:var(--bg);
+  overflow:hidden;
+}
 
 /* ── Login ── */
-#login-screen{position:fixed;inset:0;background:#1c1c1e;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:40px 28px;}
-.login-logo{font-size:34px;font-weight:700;color:#fff;letter-spacing:-0.8px;margin-bottom:4px;}
-.login-tagline{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:52px;}
-.login-card{background:#2c2c2e;border-radius:20px;padding:28px 22px;width:100%;max-width:340px;}
-.login-title{font-size:17px;font-weight:600;color:#fff;margin-bottom:4px;}
-.login-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.6;}
-.btn-google{width:100%;padding:13px;border-radius:var(--r);border:none;background:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#1c1c1e;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+#login-screen{
+  position:fixed;inset:0;
+  background:#1c1c1e;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:500;
+  padding:40px 28px;
+}
+.login-logo{font-size:32px;font-weight:700;color:#fff;letter-spacing:-0.8px;margin-bottom:4px;}
+.login-sub-logo{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:52px;}
+.login-card{background:#2c2c2e;border-radius:18px;padding:24px 20px;width:100%;max-width:340px;}
+.login-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:4px;}
+.login-desc{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:18px;line-height:1.6;}
+.btn-google{width:100%;padding:13px;border-radius:var(--r);border:none;background:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#1c1c1e;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;}
 .google-icon{width:18px;height:18px;flex-shrink:0;}
-.btn-guest{width:100%;padding:12px;border-radius:var(--r);border:none;background:rgba(255,255,255,0.1);font-family:'Inter',sans-serif;font-size:14px;color:rgba(255,255,255,0.6);cursor:pointer;}
-.login-note{font-size:11px;color:rgba(255,255,255,0.28);text-align:center;margin-top:18px;line-height:1.7;}
-
-/* ── Install banner ── */
-.install-banner{display:none;align-items:center;gap:10px;padding:8px 16px;background:var(--accent-light);border-bottom:1px solid var(--border);}
-.install-banner.visible{display:flex;}
-.install-text{font-size:13px;color:var(--accent);flex:1;}
-.install-btn{font-size:12px;padding:4px 12px;background:var(--accent);color:white;border:none;border-radius:99px;cursor:pointer;font-weight:500;}
-.install-close{font-size:20px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1;}
+.btn-guest{width:100%;padding:11px;border-radius:var(--r);border:none;background:rgba(255,255,255,0.1);font-family:'Inter',sans-serif;font-size:14px;color:rgba(255,255,255,0.55);cursor:pointer;}
+.login-note{font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:16px;line-height:1.7;}
 
 /* ── Top bar ── */
 .topbar{
-  padding:calc(12px + var(--safe-top)) 16px 0;
+  padding:calc(10px + var(--safe-top)) 16px 0;
   background:var(--bg);
   flex-shrink:0;
 }
-.topbar-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.topbar-title{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
-.topbar-back{font-size:15px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;display:flex;align-items:center;gap:3px;padding:0;}
-.user-btn{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:white;cursor:pointer;border:none;flex-shrink:0;}
+.topbar-title-row{display:flex;align-items:center;margin-bottom:10px;}
+.topbar-title{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;flex:1;}
+.topbar-back{font-size:15px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;padding:0;}
 
-/* ── Search bar (always visible, capsule) ── */
-.search-bar{
-  position:relative;
-  margin-bottom:12px;
-}
+/* ── Search bar (capsule, always visible) ── */
+.search-bar{position:relative;margin-bottom:12px;}
 .search-bar input{
   width:100%;
-  padding:9px 16px 9px 36px;
+  padding:9px 16px 9px 34px;
   border-radius:99px;
   border:none;
   background:var(--card);
-  font-size:15px;
-  color:var(--ink);
+  font-size:15px;color:var(--ink);
   font-family:'Inter',sans-serif;
   outline:none;
-  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  box-shadow:0 1px 2px rgba(0,0,0,0.06);
+  -webkit-appearance:none;
 }
 .search-bar input::placeholder{color:var(--muted);}
-.search-bar-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
+.search-icon{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;opacity:0.4;pointer-events:none;
+}
+.search-icon svg{width:14px;height:14px;}
 
 /* ── Scroll area ── */
-.scroll-area{flex:1;overflow-y:auto;padding:0 16px calc(var(--tab-h) + 16px);-webkit-overflow-scrolling:touch;}
-.scroll-area.no-pad{padding-left:0;padding-right:0;}
+.scroll-area{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:0 16px calc(var(--tab-h) + 16px);
+  overscroll-behavior:contain;
+}
 
-/* ── 2-col grid ── */
-.word-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.word-card{background:var(--card);border-radius:var(--r);padding:14px 13px;cursor:pointer;transition:opacity 0.12s;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-.word-card:active{opacity:0.7;}
+/* ── 2-col grid (vocab) ── */
+.word-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.word-card{
+  background:var(--card);
+  border-radius:var(--r);
+  padding:14px 12px;
+  cursor:pointer;
+}
+.word-card:active{opacity:0.65;}
 .word-en{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .word-zh{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px;}
 .pos-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
 .pos-n{background:var(--accent-light);color:var(--accent);}
 .pos-v{background:var(--green-light);color:var(--green-dark);}
-.pos-adj{background:var(--amber-light);color:var(--amber);}
+.pos-adj{background:var(--orange-light);color:var(--orange);}
 .pos-adv{background:var(--teal-light);color:#0a84ff;}
 .pos-phr,.pos-other{background:var(--faint);color:var(--muted);}
 
-/* Single-col list (phrase, grammar, pattern) */
-.word-list{display:flex;flex-direction:column;gap:8px;}
-.list-card{background:var(--card);border-radius:var(--r);padding:14px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-.list-card:active{opacity:0.7;}
+/* ── Single-col list ── */
+.word-list{display:flex;flex-direction:column;gap:7px;}
+.list-card{background:var(--card);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.list-card:active{opacity:0.65;}
 .list-card-body{flex:1;min-width:0;}
 .list-en{font-size:15px;font-weight:500;color:var(--ink);}
 .list-zh{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .empty-state{text-align:center;padding:60px 0;color:var(--muted);}
-.empty-icon{font-size:40px;margin-bottom:12px;}
-.empty-text{font-size:14px;line-height:1.7;}
+.empty-title{font-size:17px;font-weight:600;color:var(--ink2);margin-bottom:6px;}
+.empty-desc{font-size:14px;color:var(--muted);line-height:1.6;}
 
 /* ── Bottom tab bar ── */
 .tab-bar{
-  position:fixed;
-  bottom:0;left:50%;
-  transform:translateX(-50%);
-  width:100%;max-width:430px;
+  position:absolute;bottom:0;left:0;right:0;
   height:var(--tab-h);
-  background:rgba(255,255,255,0.92);
+  background:rgba(249,249,249,0.94);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   border-top:0.5px solid var(--border);
-  display:flex;
-  align-items:flex-start;
-  padding-top:6px;
+  display:flex;align-items:flex-start;
+  padding-top:5px;
   z-index:30;
-  padding-bottom:var(--safe-bottom);
+  flex-shrink:0;
 }
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;border:none;background:none;}
-.tab-icon{font-size:22px;line-height:1;}
-.tab-label{font-size:10px;font-weight:500;color:var(--muted);letter-spacing:0.1px;}
-.tab-item.active .tab-icon{filter:none;}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;border:none;background:none;font-family:'Inter',sans-serif;}
+.tab-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.tab-icon svg{width:22px;height:22px;fill:none;stroke:var(--muted);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.15s;}
+.tab-label{font-size:10px;font-weight:500;color:var(--muted);letter-spacing:0.1px;transition:color 0.15s;}
+.tab-item.active .tab-icon svg{stroke:var(--accent);}
 .tab-item.active .tab-label{color:var(--accent);}
-.tab-item .tab-icon{opacity:0.45;}
-.tab-item.active .tab-icon{opacity:1;}
 
 /* ── FAB ── */
 .fab{
-  position:fixed;
-  bottom:calc(var(--tab-h) + 12px);
-  right:calc(50% - 215px + var(--safe-right));
-  width:48px;height:48px;
+  position:absolute;
+  bottom:calc(var(--tab-h) + 14px);
+  right:16px;
+  width:46px;height:46px;
   border-radius:99px;
   background:var(--accent);
-  color:white;font-size:26px;
+  color:white;
+  font-size:24px;line-height:1;
   border:none;cursor:pointer;
-  box-shadow:0 4px 14px rgba(0,122,255,0.4);
+  box-shadow:0 3px 12px rgba(0,122,255,0.38);
   display:flex;align-items:center;justify-content:center;
   z-index:25;
-  transition:transform 0.15s;
+  transition:transform 0.12s;
 }
-.fab:active{transform:scale(0.93);}
-@media(max-width:430px){.fab{right:16px;}}
+.fab:active{transform:scale(0.92);}
 
 /* ── Modal sheet ── */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.32);
+  z-index:200;
+  align-items:flex-end;justify-content:center;
+}
 .overlay.open{display:flex;}
 .modal{
   background:var(--bg);
-  border-radius:20px 20px 0 0;
-  padding:0;
+  border-radius:18px 18px 0 0;
   width:100%;max-width:430px;
-  max-height:88vh;
+  max-height:72vh;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:calc(12px + var(--safe-bottom));
+  padding-bottom:calc(10px + var(--safe-bottom));
+  overscroll-behavior:contain;
 }
-.modal-handle{width:36px;height:4px;background:#d1d1d6;border-radius:2px;margin:10px auto 0;}
-.modal-header{padding:14px 18px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.modal-title{font-size:17px;font-weight:700;color:var(--ink);}
-.modal-close{width:28px;height:28px;border-radius:99px;background:var(--faint);border:none;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;}
-.modal-body{padding:0 16px;}
+.modal-handle{width:32px;height:4px;background:#d1d1d6;border-radius:2px;margin:10px auto 0;}
+.modal-header{padding:12px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.modal-title{font-size:16px;font-weight:700;color:var(--ink);}
+.modal-close{width:26px;height:26px;border-radius:99px;background:var(--faint);border:none;cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.modal-body{padding:0 14px;}
 
 /* Form */
 .field{margin-bottom:10px;}
 .field-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
-.field-input,.field-textarea{width:100%;padding:10px 12px;border:none;border-radius:var(--r-sm);font-size:15px;color:var(--ink);font-family:'Inter',sans-serif;background:var(--card);outline:none;box-shadow:0 0 0 1px var(--border);}
+.field-input,.field-textarea{
+  width:100%;padding:10px 12px;
+  border:none;border-radius:var(--r-sm);
+  font-size:15px;color:var(--ink);
+  font-family:'Inter',sans-serif;
+  background:var(--card);outline:none;
+  box-shadow:0 0 0 1px var(--border);
+  -webkit-appearance:none;
+}
 .field-input:focus,.field-textarea:focus{box-shadow:0 0 0 2px var(--accent);}
 .field-textarea{resize:none;line-height:1.5;}
 .field-input::placeholder,.field-textarea::placeholder{color:#c7c7cc;}
-.trans-box{margin-bottom:10px;padding:9px 12px;border-radius:var(--r-sm);background:var(--accent-light);display:flex;align-items:center;gap:8px;}
-.trans-label{font-size:12px;color:var(--accent);flex:1;}
-.spinner{width:12px;height:12px;border:2px solid rgba(0,122,255,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+
+/* Translate button row */
+.trans-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px;}
+.trans-row .field{flex:1;margin-bottom:0;}
+.btn-translate{
+  flex-shrink:0;
+  padding:10px 14px;
+  border-radius:var(--r-sm);
+  background:var(--accent);
+  color:white;font-size:13px;font-weight:600;
+  border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+  height:40px;
+  display:flex;align-items:center;gap:5px;
+}
+.btn-translate:disabled{background:var(--border);color:var(--muted);cursor:default;}
+.btn-translate.loading{background:var(--border);color:var(--muted);cursor:default;}
+.spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+.trans-result{
+  padding:8px 12px;border-radius:var(--r-sm);
+  background:var(--accent-light);
+  font-size:12px;color:var(--accent);
+  margin-bottom:10px;
+  display:none;
+}
+
 .pos-picker{display:flex;gap:6px;flex-wrap:wrap;}
-.pos-tag{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);transition:all 0.12s;}
+.pos-tag{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);}
 .pos-tag.active{background:var(--accent);color:white;border-color:var(--accent);}
 .example-group{display:flex;flex-direction:column;gap:6px;}
-.example-row{display:flex;gap:8px;align-items:flex-start;}
+.example-row{display:flex;gap:6px;align-items:flex-start;}
 .example-num{font-size:11px;font-weight:700;color:var(--muted);padding-top:11px;min-width:12px;}
-.btn-row{display:flex;gap:8px;padding:12px 16px 0;}
-.btn-primary{flex:1;padding:13px;border-radius:var(--r);background:var(--accent);color:white;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
-.btn-danger{padding:13px 16px;border-radius:var(--r);background:var(--red-light);color:var(--red);font-size:15px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+
+.btn-row{display:flex;gap:8px;padding:10px 14px 0;}
+.btn-primary{flex:1;padding:12px;border-radius:var(--r);background:var(--accent);color:white;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-danger{padding:12px 16px;border-radius:var(--r);background:var(--red-light);color:var(--red);font-size:15px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
 
 /* ── Detail page ── */
-.detail-header{padding:0 16px 16px;}
-.detail-en{font-size:32px;font-weight:700;color:var(--ink);letter-spacing:-0.8px;line-height:1.15;margin-bottom:4px;}
-.detail-pos{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;font-weight:600;margin-bottom:16px;}
-.detail-zh-big{font-size:20px;font-weight:500;color:var(--ink2);margin-bottom:20px;}
-.detail-section{margin-bottom:20px;padding:0 16px;}
+.detail-wrap{padding:0 16px;}
+.detail-en{font-size:30px;font-weight:700;color:var(--ink);letter-spacing:-0.7px;line-height:1.15;margin-bottom:4px;}
+.detail-pos{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;font-weight:600;margin-bottom:12px;}
+.detail-zh{font-size:19px;font-weight:500;color:var(--ink2);margin-bottom:20px;}
+.detail-section{margin-bottom:18px;}
 .detail-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;}
-.detail-note{font-size:14px;color:var(--ink2);background:var(--amber-light);border-radius:var(--r-sm);padding:12px 14px;line-height:1.7;}
-.chip-row{display:flex;flex-wrap:wrap;gap:6px;}
-.chip{font-size:13px;padding:5px 12px;border-radius:99px;background:var(--faint);color:var(--ink2);}
+.detail-note{font-size:14px;color:var(--ink2);background:var(--orange-light);border-radius:var(--r-sm);padding:11px 13px;line-height:1.7;}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{font-size:13px;padding:4px 11px;border-radius:99px;background:var(--faint);color:var(--ink2);}
 .chip.syn{background:var(--green-light);color:var(--green-dark);}
 .chip.ant{background:var(--red-light);color:var(--red);}
-
-/* Example with zh translation */
-.example-list{display:flex;flex-direction:column;gap:12px;}
-.example-item{padding:12px 14px;background:var(--card);border-radius:var(--r-sm);box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-.example-item-num{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
-.example-en{font-size:14px;color:var(--ink);line-height:1.6;margin-bottom:4px;}
-.example-zh-trans{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;}
+.example-card{background:var(--card);border-radius:var(--r-sm);padding:12px 13px;margin-bottom:8px;}
+.example-card-num{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.example-card-en{font-size:14px;color:var(--ink);line-height:1.6;margin-bottom:4px;}
+.example-card-zh{font-size:12px;color:var(--muted);line-height:1.5;}
 
 /* ── Quiz ── */
-.quiz-config{background:var(--card);border-radius:var(--r);margin-bottom:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-.config-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid var(--border);}
+.quiz-config{background:var(--card);border-radius:var(--r);margin-bottom:14px;overflow:hidden;}
+.config-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:0.5px solid var(--border);}
 .config-row:last-child{border-bottom:none;}
 .config-label{font-size:15px;color:var(--ink);}
 .config-select{padding:5px 10px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:13px;color:var(--ink);background:var(--faint);font-family:'Inter',sans-serif;outline:none;}
 .btn-start{width:100%;padding:14px;border-radius:var(--r);background:var(--accent);color:white;font-size:16px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
-.quiz-progress{display:flex;gap:3px;margin-bottom:16px;}
-.progress-dot{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background 0.3s;}
+.quiz-progress{display:flex;gap:3px;margin-bottom:14px;}
+.progress-dot{flex:1;height:3px;border-radius:2px;background:var(--border);}
 .progress-dot.done{background:var(--accent);}
-.progress-dot.current{background:#5ac8fa;}
-.quiz-question-box{background:var(--card);border-radius:var(--r);padding:28px 20px;text-align:center;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-.quiz-prompt{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;}
-.quiz-word{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;line-height:1.3;}
-.quiz-hint{font-size:13px;color:var(--muted);margin-top:8px;}
-.quiz-options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
-.quiz-option{padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--card);font-size:15px;color:var(--ink);cursor:pointer;text-align:left;font-family:'Inter',sans-serif;}
-.quiz-option:active:not(:disabled){opacity:0.7;}
+.progress-dot.current{background:var(--teal);}
+.quiz-question-box{background:var(--card);border-radius:var(--r);padding:24px 18px;text-align:center;margin-bottom:12px;}
+.quiz-prompt{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;}
+.quiz-word{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;line-height:1.3;}
+.quiz-hint{font-size:13px;color:var(--muted);margin-top:6px;}
+.quiz-options{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.quiz-option{padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--card);font-size:15px;color:var(--ink);cursor:pointer;text-align:left;font-family:'Inter',sans-serif;}
 .quiz-option.correct{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:500;}
 .quiz-option.wrong{border-color:var(--red);background:var(--red-light);color:var(--red);}
 .quiz-option:disabled{cursor:default;}
-.fill-input{width:100%;padding:14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:17px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--card);text-align:center;outline:none;margin-bottom:10px;}
+.fill-input{width:100%;padding:13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:17px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--card);text-align:center;outline:none;margin-bottom:8px;-webkit-appearance:none;}
 .fill-input:focus{border-color:var(--accent);}
 .fill-input.correct{border-color:var(--green);color:var(--green-dark);}
 .fill-input.wrong{border-color:var(--red);color:var(--red);}
-.quiz-feedback{padding:10px 14px;border-radius:var(--r-sm);font-size:14px;font-weight:500;text-align:center;margin-bottom:12px;}
+.quiz-feedback{padding:10px 14px;border-radius:var(--r-sm);font-size:14px;font-weight:500;text-align:center;margin-bottom:10px;}
 .quiz-feedback.correct{background:var(--green-light);color:var(--green-dark);}
 .quiz-feedback.wrong{background:var(--red-light);color:var(--red);}
-.btn-next{width:100%;padding:13px;border-radius:var(--r);background:var(--ink);color:white;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
-.score-ring{width:110px;height:110px;border-radius:50%;background:var(--accent-light);border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;}
+.btn-next{width:100%;padding:12px;border-radius:var(--r);background:var(--ink);color:white;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.score-ring{width:108px;height:108px;border-radius:50%;background:var(--accent-light);border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 14px;}
 .score-num{font-size:32px;font-weight:700;color:var(--accent);}
 .score-total{font-size:12px;color:var(--muted);}
-.result-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:var(--r-sm);margin-bottom:7px;}
+.result-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);margin-bottom:6px;}
 .result-row.ok{background:var(--green-light);}
 .result-row.fail{background:var(--red-light);}
 
-/* Calendar */
-.cal-wrap{margin-top:24px;border-top:0.5px solid var(--border);padding-top:20px;}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+/* ── Calendar (orange dot style) ── */
+.cal-wrap{margin-top:20px;border-top:0.5px solid var(--border);padding-top:18px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-title-row{display:flex;align-items:center;gap:6px;}
 .cal-title{font-size:15px;font-weight:600;color:var(--ink);}
-.cal-nav{width:30px;height:30px;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.cal-streak{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;margin-top:4px;}
+.cal-nav{
+  width:28px;height:28px;border-radius:99px;
+  border:none;background:var(--faint);
+  color:var(--muted);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-streak{font-size:12px;font-weight:600;color:var(--orange);background:var(--orange-light);padding:3px 9px;border-radius:99px;}
 .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
-.cal-weekday{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);}
-.cal-day.has-date{color:var(--ink);}
-.cal-day.checked{background:var(--accent);color:white;font-weight:700;}
-.cal-day.today:not(.checked){border:1.5px solid var(--accent);color:var(--accent);font-weight:600;}
+.cal-weekday{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:3px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{
+  aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--muted);
+  border-radius:50%;
+  position:relative;
+}
+.cal-day.has-date{color:var(--ink2);}
+.cal-day.checked{
+  background:var(--orange);
+  color:white;
+  font-weight:600;
+}
+.cal-day.checked::after{
+  content:'';
+  position:absolute;
+  width:6px;height:6px;
+  background:white;
+  border-radius:50%;
+  bottom:4px;
+  opacity:0.7;
+  display:none;
+}
+.cal-day.today:not(.checked){
+  border:1.5px solid var(--orange);
+  color:var(--orange);
+  font-weight:600;
+}
 .cal-note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
 
-/* Toast */
-.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%) translateY(14px);background:rgba(28,28,30,0.9);color:white;padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:400;white-space:nowrap;pointer-events:none;backdrop-filter:blur(10px);}
+/* ── Toast ── */
+.toast{
+  position:fixed;
+  bottom:calc(var(--tab-h) + 12px);
+  left:50%;transform:translateX(-50%) translateY(14px);
+  background:rgba(28,28,30,0.88);
+  color:white;padding:8px 18px;border-radius:99px;
+  font-size:13px;font-weight:500;
+  opacity:0;transition:opacity 0.2s,transform 0.2s;
+  z-index:400;white-space:nowrap;pointer-events:none;
+  backdrop-filter:blur(10px);
+}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* Translate loading indicator */
-.trans-pending{display:flex;align-items:center;gap:6px;padding:6px 0;font-size:12px;color:var(--muted);}
+/* Install banner */
+.install-banner{display:none;align-items:center;gap:10px;padding:8px 14px;background:var(--accent-light);flex-shrink:0;}
+.install-banner.visible{display:flex;}
+.install-text{font-size:13px;color:var(--accent);flex:1;}
+.install-btn{font-size:12px;padding:4px 12px;background:var(--accent);color:white;border:none;border-radius:99px;cursor:pointer;font-weight:500;}
+.install-close{font-size:18px;color:var(--muted);cursor:pointer;background:none;border:none;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.word-card,.list-card{animation:fadeUp 0.2s ease both;}
+.word-card,.list-card{animation:fadeUp 0.18s ease both;}
 </style>
 </head>
 <body>
@@ -296,10 +408,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 <!-- Login -->
 <div id="login-screen">
   <div class="login-logo">WordVault</div>
-  <div class="login-tagline">你的個人英文學習本</div>
+  <div class="login-sub-logo">你的個人英文學習本</div>
   <div class="login-card">
     <div class="login-title">登入以同步資料</div>
-    <div class="login-sub">在手機、電腦、平板之間自動同步。</div>
+    <div class="login-desc">在手機、電腦、平板之間自動同步。</div>
     <button class="btn-google" onclick="loginGoogle()">
       <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       使用 Google 帳號登入
@@ -309,61 +421,50 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
   <div class="login-note">登入資料僅用於同步，不會分享給第三方</div>
 </div>
 
-<!-- Install banner -->
-<div class="install-banner" id="install-banner">
-  <span class="install-text">加到主畫面，像 App 一樣使用</span>
-  <button class="install-btn" onclick="installPWA()">安裝</button>
-  <button class="install-close" onclick="document.getElementById('install-banner').classList.remove('visible')">×</button>
-</div>
-
 <div class="app">
+  <!-- Install banner -->
+  <div class="install-banner" id="install-banner">
+    <span class="install-text">加到主畫面，像 App 一樣使用</span>
+    <button class="install-btn" onclick="installPWA()">安裝</button>
+    <button class="install-close" onclick="document.getElementById('install-banner').classList.remove('visible')">×</button>
+  </div>
+
   <!-- Top bar -->
   <div class="topbar" id="main-topbar">
     <div class="topbar-title-row">
       <span class="topbar-title" id="page-title">單字</span>
-      <button class="user-btn" id="user-btn" onclick="showUserMenu()" style="display:none">YU</button>
     </div>
-    <!-- Persistent search -->
     <div class="search-bar" id="search-bar">
-      <span class="search-bar-icon">🔍</span>
+      <div class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </div>
       <input id="search-input" placeholder="搜尋..." oninput="renderList()">
     </div>
   </div>
 
   <!-- Scroll content -->
   <div class="scroll-area" id="scroll-area">
-
-    <!-- Vocab -->
     <div id="page-vocab">
       <div class="word-grid" id="word-list"></div>
-      <div class="empty-state" id="empty-vocab" style="display:none"><div class="empty-icon">📖</div><div class="empty-text">還沒有單字<br>點右下角 ＋ 新增</div></div>
+      <div class="empty-state" id="empty-vocab" style="display:none"><div class="empty-title">尚無單字</div><div class="empty-desc">點右下角 + 新增第一個單字</div></div>
     </div>
-
-    <!-- Phrase -->
     <div id="page-phrase" style="display:none">
       <div class="word-list" id="phrase-list"></div>
-      <div class="empty-state" id="empty-phrase" style="display:none"><div class="empty-icon">💬</div><div class="empty-text">還沒有片語<br>點右下角 ＋ 新增</div></div>
+      <div class="empty-state" id="empty-phrase" style="display:none"><div class="empty-title">尚無片語</div><div class="empty-desc">點右下角 + 新增</div></div>
     </div>
-
-    <!-- Grammar -->
     <div id="page-grammar" style="display:none">
       <div class="word-list" id="grammar-list"></div>
-      <div class="empty-state" id="empty-grammar" style="display:none"><div class="empty-icon">📐</div><div class="empty-text">還沒有文法筆記<br>點右下角 ＋ 新增</div></div>
+      <div class="empty-state" id="empty-grammar" style="display:none"><div class="empty-title">尚無文法筆記</div><div class="empty-desc">點右下角 + 新增</div></div>
     </div>
-
-    <!-- Pattern -->
     <div id="page-pattern" style="display:none">
       <div class="word-list" id="pattern-list"></div>
-      <div class="empty-state" id="empty-pattern" style="display:none"><div class="empty-icon">🗣️</div><div class="empty-text">還沒有句型<br>點右下角 ＋ 新增</div></div>
+      <div class="empty-state" id="empty-pattern" style="display:none"><div class="empty-title">尚無句型</div><div class="empty-desc">點右下角 + 新增</div></div>
     </div>
 
     <!-- Quiz -->
     <div id="page-quiz" style="display:none">
       <div id="quiz-setup-area">
-        <div style="padding:8px 0 20px;text-align:left">
-          <div style="font-size:22px;font-weight:700;color:var(--ink);margin-bottom:4px">隨堂測驗</div>
-          <div style="font-size:14px;color:var(--muted)">從你的學習內容中自動出題</div>
-        </div>
+        <div style="padding:4px 0 18px"><div style="font-size:22px;font-weight:700;color:var(--ink);margin-bottom:3px">隨堂測驗</div><div style="font-size:14px;color:var(--muted)">從學習內容中自動出題</div></div>
         <div class="quiz-config">
           <div class="config-row"><span class="config-label">題目範圍</span><select class="config-select" id="quiz-scope"><option value="all">全部類別</option><option value="vocab">只考單字</option><option value="phrase">只考片語</option></select></div>
           <div class="config-row"><span class="config-label">題型</span><select class="config-select" id="quiz-type"><option value="choice">選擇題</option><option value="fill">填空題</option><option value="mixed">混合</option></select></div>
@@ -373,7 +474,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
         <button class="btn-start" onclick="startQuiz()">開始測驗</button>
       </div>
       <div id="quiz-active-area" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <span style="font-size:13px;color:var(--muted);font-weight:500" id="quiz-counter">第 1 題 / 10</span>
           <button onclick="endQuiz()" style="font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif">放棄</button>
         </div>
@@ -384,66 +485,68 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
         <button class="btn-next" id="btn-next" style="display:none" onclick="nextQuestion()">下一題 →</button>
       </div>
       <div id="quiz-result-area" style="display:none">
-        <div style="text-align:center;padding:24px 0 16px">
+        <div style="text-align:center;padding:20px 0 14px">
           <div class="score-ring"><div class="score-num" id="result-score-num">0</div><div class="score-total" id="result-score-total">/ 0</div></div>
-          <div style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:4px" id="result-label"></div>
+          <div style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px" id="result-label"></div>
           <div style="font-size:13px;color:var(--muted)" id="result-sub"></div>
         </div>
         <div id="result-list"></div>
         <div class="cal-wrap">
           <div class="cal-header">
             <button class="cal-nav" onclick="calPrev()">‹</button>
-            <div style="text-align:center"><div class="cal-title" id="cal-month-label"></div><div class="cal-streak" id="cal-streak" style="margin-top:4px"></div></div>
+            <div class="cal-title-row">
+              <div class="cal-title" id="cal-month-label"></div>
+              <div class="cal-streak" id="cal-streak" style="display:none"></div>
+            </div>
             <button class="cal-nav" onclick="calNext()">›</button>
           </div>
           <div class="cal-weekdays"><div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div><div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div><div class="cal-weekday">六</div></div>
           <div class="cal-grid" id="cal-grid"></div>
           <div class="cal-note" id="cal-note"></div>
         </div>
-        <button class="btn-start" style="margin-top:20px" onclick="endQuiz()">再測一次</button>
+        <button class="btn-start" style="margin-top:16px" onclick="endQuiz()">再測一次</button>
       </div>
     </div>
 
     <!-- Detail -->
     <div id="page-detail" style="display:none">
-      <div id="detail-body"></div>
-      <div style="padding:0 16px;margin-top:20px;display:flex;gap:10px">
+      <div class="detail-wrap" id="detail-body"></div>
+      <div style="padding:16px 16px 0;display:flex;gap:8px">
         <button class="btn-primary" id="detail-edit-btn" style="flex:1">編輯</button>
         <button class="btn-danger" id="detail-del-btn">刪除</button>
       </div>
     </div>
-
-  </div><!-- end scroll-area -->
+  </div>
 
   <!-- Bottom tab bar -->
-  <div class="tab-bar" id="tab-bar">
+  <div class="tab-bar">
     <button class="tab-item active" id="tab-vocab" onclick="switchTab('vocab','單字')">
-      <span class="tab-icon">📖</span>
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <span class="tab-label">單字</span>
     </button>
     <button class="tab-item" id="tab-phrase" onclick="switchTab('phrase','片語')">
-      <span class="tab-icon">💬</span>
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
       <span class="tab-label">片語</span>
     </button>
     <button class="tab-item" id="tab-grammar" onclick="switchTab('grammar','文法')">
-      <span class="tab-icon">📐</span>
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
       <span class="tab-label">文法</span>
     </button>
     <button class="tab-item" id="tab-pattern" onclick="switchTab('pattern','句型')">
-      <span class="tab-icon">🗣️</span>
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
       <span class="tab-label">句型</span>
     </button>
     <button class="tab-item" id="tab-quiz" onclick="switchQuiz()">
-      <span class="tab-icon">✏️</span>
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
       <span class="tab-label">測驗</span>
     </button>
   </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openAddModal()">+</button>
 </div>
 
-<!-- FAB -->
-<button class="fab" id="fab" onclick="openAddModal()">＋</button>
-
-<!-- Add/Edit Modal -->
+<!-- Modal -->
 <div class="overlay" id="overlay" onclick="closeOverlay(event)">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -452,10 +555,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
       <button class="modal-close" onclick="document.getElementById('overlay').classList.remove('open')">×</button>
     </div>
     <div class="modal-body">
-      <div class="field"><div class="field-label">英文</div><input class="field-input" id="input-en" placeholder="輸入英文..." oninput="onEnInput()"></div>
-      <div id="trans-box" class="trans-box" style="display:none"><div id="trans-inner" style="display:flex;align-items:center;gap:8px;width:100%"><div class="spinner"></div><span class="trans-label">AI 自動填入中...</span></div></div>
-      <div class="field"><div class="field-label">中文翻譯</div><input class="field-input" id="input-zh" placeholder="自動帶入後可修改..."></div>
+      <!-- English + Translate button in same row -->
+      <div class="field-label">英文</div>
+      <div class="trans-row">
+        <div class="field">
+          <input class="field-input" id="input-en" placeholder="輸入英文單字...">
+        </div>
+        <button class="btn-translate" id="btn-translate" onclick="doTranslate()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+          翻譯
+        </button>
+      </div>
+      <div class="trans-result" id="trans-result"></div>
+
+      <div class="field"><div class="field-label">中文翻譯</div><input class="field-input" id="input-zh" placeholder="翻譯後自動填入，可修改..."></div>
       <div class="field" id="pos-field"><div class="field-label">詞性</div><div class="pos-picker"><span class="pos-tag" onclick="pickPos(this)">n.</span><span class="pos-tag" onclick="pickPos(this)">v.</span><span class="pos-tag" onclick="pickPos(this)">adj.</span><span class="pos-tag" onclick="pickPos(this)">adv.</span><span class="pos-tag" onclick="pickPos(this)">phr.</span><span class="pos-tag" onclick="pickPos(this)">其他</span></div></div>
+
       <div id="vocab-extra">
         <div class="field"><div class="field-label">同義詞（逗號分隔）</div><input class="field-input" id="input-syn" placeholder="e.g. strong, tough"></div>
         <div class="field"><div class="field-label">反義詞（逗號分隔）</div><input class="field-input" id="input-ant" placeholder="e.g. fragile, weak"></div>
@@ -502,12 +617,9 @@ window.logoutUser=async function(){if(!DEMO&&auth){if(unsub)unsub();await signOu
 window.showUserMenu=function(){if(confirm('登出？'))logoutUser();};
 function hideLogo(){document.getElementById('login-screen').style.display='none';}
 function setupSync(u){
-  const initials=(u.displayName||u.email||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const btn=document.getElementById('user-btn');
-  btn.textContent=initials;btn.style.display='flex';
   if(DEMO){loadLocal();return;}
   const ref=doc(db,'users',u.uid,'app','data');
-  getDoc(ref).then(s=>{if(s.exists()){const r=s.data();delete r.updatedAt;window._d=r;saveLocal();}else{push(u.uid);}renderList();}).catch(()=>{loadLocal();});
+  getDoc(ref).then(s=>{if(s.exists()){const r=s.data();delete r.updatedAt;window._d=r;saveLocal();}else push(u.uid);renderList();}).catch(()=>loadLocal());
   if(unsub)unsub();
   unsub=onSnapshot(ref,s=>{if(s.exists()&&!s.metadata.hasPendingWrites){const r=s.data();delete r.updatedAt;window._d=r;saveLocal();renderList();}},()=>{});
 }
@@ -530,27 +642,26 @@ function seed(){
   window._d.vocab=[
     {id:uid(),en:'resilience',zh:'韌性；復原力',pos:'n.',syn:'strength, toughness',ant:'fragility, weakness',examples:['Her resilience helped her overcome every obstacle.','The team showed great resilience after the setback.','Children often display remarkable resilience.'],note:'面試常用詞'},
     {id:uid(),en:'procrastinate',zh:'拖延；延遲行動',pos:'v.',syn:'delay, postpone, defer',ant:'act, proceed',examples:["Stop procrastinating and start now.","She tends to procrastinate on difficult decisions.","Don't procrastinate — deadlines are approaching."],note:''},
-    {id:uid(),en:'witty',zh:'機智的；聰慧幽默的',pos:'adj.',syn:'clever, humorous, sharp',ant:'dull, serious',examples:['His witty remarks made everyone laugh.','She gave a witty response to the interviewer.','The comedian was known for his witty observations.'],note:''},
+    {id:uid(),en:'witty',zh:'機智的；聰慧幽默的',pos:'adj.',syn:'clever, humorous, sharp',ant:'dull, serious',examples:['His witty remarks made everyone laugh.','She gave a witty response.','The comedian was known for his witty observations.'],note:''},
   ];
   window._d.phrase=[
     {id:uid(),en:'break the ice',zh:'打破僵局；活躍氣氛',pos:'phr.',syn:'',ant:'',examples:['He told a joke to break the ice.','A fun game can help break the ice between strangers.','She broke the ice with a funny story.'],note:''},
   ];
 }
 
-// ── Navigation ──
 let tab='vocab',eid=null,etab=null;
 
 function switchTab(t,l){
   tab=t;
   ['vocab','phrase','grammar','pattern','quiz'].forEach(x=>{
     document.getElementById('page-'+x).style.display=x===t?'block':'none';
-    document.getElementById('tab-'+x)?.classList.toggle('active',x===t);
+    const tb=document.getElementById('tab-'+x);
+    if(tb)tb.classList.toggle('active',x===t);
   });
   document.getElementById('page-detail').style.display='none';
   document.getElementById('page-title').textContent=l||'WordVault';
   document.getElementById('fab').style.display='flex';
   document.getElementById('search-bar').style.display='block';
-  document.getElementById('tab-bar').style.display='flex';
   document.getElementById('scroll-area').scrollTop=0;
   renderList();
 }
@@ -560,11 +671,7 @@ function switchQuiz(){
   ['vocab','phrase','grammar','pattern'].forEach(x=>document.getElementById('page-'+x).style.display='none');
   document.getElementById('page-quiz').style.display='block';
   document.getElementById('page-detail').style.display='none';
-  document.getElementById('tab-vocab').classList.remove('active');
-  document.getElementById('tab-phrase').classList.remove('active');
-  document.getElementById('tab-grammar').classList.remove('active');
-  document.getElementById('tab-pattern').classList.remove('active');
-  document.getElementById('tab-quiz').classList.add('active');
+  ['vocab','phrase','grammar','pattern','quiz'].forEach(x=>{const tb=document.getElementById('tab-'+x);if(tb)tb.classList.toggle('active',x==='quiz');});
   document.getElementById('page-title').textContent='測驗';
   document.getElementById('fab').style.display='none';
   document.getElementById('search-bar').style.display='none';
@@ -577,45 +684,38 @@ function openDetail(t,id){
   document.getElementById('page-detail').style.display='block';
   document.getElementById('fab').style.display='none';
   document.getElementById('search-bar').style.display='none';
+  const labels={vocab:'単字',phrase:'片語',grammar:'文法',pattern:'句型'};
+  const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
 
-  const labels={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
-  document.getElementById('page-title').textContent=labels[t]||'';
-
-  // Back button in topbar
+  // Replace topbar title with back
   const titleRow=document.querySelector('.topbar-title-row');
-  titleRow.innerHTML=`<button class="topbar-back" onclick="goHome()">‹ ${labels[t]||'返回'}</button><button class="user-btn" id="user-btn" onclick="showUserMenu()" style="display:flex">${document.getElementById('user-btn')?.textContent||''}</button>`;
+  titleRow.innerHTML=`<button class="topbar-back" onclick="goHome()">‹ ${lb[t]||''}</button>`;
 
-  const posBadge=item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}" style="display:inline-block;margin-bottom:16px">${item.pos}</span>`:'';
+  const posBadge=item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}" style="display:inline-block;margin-bottom:12px">${item.pos}</span>`:'';
   const exArr=Array.isArray(item.examples)?item.examples.filter(Boolean):(item.example?[item.example]:[]);
-
-  // Examples with placeholder zh translation note
-  const exHtml=exArr.length?`<div class="detail-section"><div class="detail-section-title">例句</div><div class="example-list">${exArr.map((ex,i)=>`<div class="example-item"><div class="example-item-num">例句 ${i+1}</div><div class="example-en">${esc(ex)}</div><div class="example-zh-trans" id="ex-zh-${id}-${i}">翻譯載入中...</div></div>`).join('')}</div></div>`:'';
-
+  const exHtml=exArr.length?`<div class="detail-section"><div class="detail-section-title">例句</div>${exArr.map((ex,i)=>`<div class="example-card"><div class="example-card-num">例句 ${i+1}</div><div class="example-card-en">${esc(ex)}</div><div class="example-card-zh" id="exzh-${id}-${i}">翻譯中...</div></div>`).join('')}</div>`:'';
   const synChips=t==='vocab'&&item.syn?item.syn.split(',').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="chip syn">${esc(s)}</span>`).join(''):'';
   const antChips=t==='vocab'&&item.ant?item.ant.split(',').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="chip ant">${esc(s)}</span>`).join(''):'';
 
   document.getElementById('detail-body').innerHTML=`
-    <div class="detail-header">
+    <div class="detail-wrap">
       ${posBadge}
       <div class="detail-en">${esc(item.en)}</div>
-      <div class="detail-zh-big">${esc(item.zh)}</div>
+      <div class="detail-zh">${esc(item.zh)}</div>
+      ${synChips?`<div class="detail-section"><div class="detail-section-title">同義詞</div><div class="chip-row">${synChips}</div></div>`:''}
+      ${antChips?`<div class="detail-section"><div class="detail-section-title">反義詞</div><div class="chip-row">${antChips}</div></div>`:''}
+      ${exHtml}
+      ${item.note?`<div class="detail-section"><div class="detail-section-title">個人筆記</div><div class="detail-note">${esc(item.note)}</div></div>`:''}
     </div>
-    ${synChips?`<div class="detail-section"><div class="detail-section-title">同義詞</div><div class="chip-row">${synChips}</div></div>`:''}
-    ${antChips?`<div class="detail-section"><div class="detail-section-title">反義詞</div><div class="chip-row">${antChips}</div></div>`:''}
-    ${exHtml}
-    ${item.note?`<div class="detail-section"><div class="detail-section-title">個人筆記</div><div class="detail-note">${esc(item.note)}</div></div>`:''}
   `;
-
-  // Auto-translate examples
-  if(exArr.length) translateExamples(exArr, id);
-
+  if(exArr.length)translateExamples(exArr,id);
   document.getElementById('detail-edit-btn').onclick=()=>openEditModal(t,id);
   document.getElementById('detail-del-btn').onclick=()=>{if(!confirm(`確定刪除「${item.en}」？`))return;window._d[t]=window._d[t].filter(i=>i.id!==id);save();showToast('已刪除');goHome();};
 }
 
-async function translateExamples(examples, id){
+async function translateExamples(examples,id){
   for(let i=0;i<examples.length;i++){
-    const el=document.getElementById(`ex-zh-${id}-${i}`);
+    const el=document.getElementById(`exzh-${id}-${i}`);
     if(!el)continue;
     try{
       const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(examples[i])}&langpair=en|zh-TW`);
@@ -628,18 +728,21 @@ async function translateExamples(examples, id){
 
 function goHome(){
   const titleRow=document.querySelector('.topbar-title-row');
-  const initials=document.getElementById('user-btn')?.textContent||'';
-  titleRow.innerHTML=`<span class="topbar-title" id="page-title">${{vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型',quiz:'測驗'}[tab]||''}</span><button class="user-btn" id="user-btn" onclick="showUserMenu()" style="display:${initials?'flex':'none'}">${initials}</button>`;
-  switchTab(tab,{vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'}[tab]);
+  const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
+  titleRow.innerHTML=`<span class="topbar-title" id="page-title">${lb[tab]||'WordVault'}</span>`;
+  switchTab(tab,lb[tab]);
 }
 
-// ── Render ──
 function renderList(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
-  const cfgs={vocab:{g:'word-list',e:'empty-vocab',grid:true},phrase:{g:'phrase-list',e:'empty-phrase'},grammar:{g:'grammar-list',e:'empty-grammar'},pattern:{g:'pattern-list',e:'empty-pattern'}};
+  const cfgs={
+    vocab:{g:'word-list',e:'empty-vocab',grid:true},
+    phrase:{g:'phrase-list',e:'empty-phrase'},
+    grammar:{g:'grammar-list',e:'empty-grammar'},
+    pattern:{g:'pattern-list',e:'empty-pattern'}
+  };
   const cfg=cfgs[tab];if(!cfg)return;
   const items=(window._d[tab]||[]).filter(i=>!q||i.en.toLowerCase().includes(q)||(i.zh||'').includes(q));
-
   if(cfg.grid){
     document.getElementById(cfg.g).innerHTML=items.map((item,idx)=>`
       <div class="word-card" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
@@ -647,13 +750,10 @@ function renderList(){
         <div class="word-zh">${esc(item.zh)}</div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
       </div>`).join('');
-  } else {
+  }else{
     document.getElementById(cfg.g).innerHTML=items.map((item,idx)=>`
       <div class="list-card" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
-        <div class="list-card-body">
-          <div class="list-en">${esc(item.en)}</div>
-          <div class="list-zh">${esc(item.zh)}</div>
-        </div>
+        <div class="list-card-body"><div class="list-en">${esc(item.en)}</div><div class="list-zh">${esc(item.zh)}</div></div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
       </div>`).join('');
   }
@@ -661,14 +761,14 @@ function renderList(){
 }
 
 // ── Modal ──
-let transTimer=null;
 const DC={};
 
 function openAddModal(){
   eid=null;etab=tab;
   document.getElementById('modal-title').textContent=`新增${tl(tab)}`;
   ['input-en','input-zh','input-syn','input-ant','input-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('trans-box').style.display='none';
+  document.getElementById('trans-result').style.display='none';
+  document.getElementById('trans-result').textContent='';
   document.getElementById('modal-del-btn').style.display='none';
   document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
   setModalMode(tab);clearEx();
@@ -685,7 +785,7 @@ function openEditModal(t,id){
   document.getElementById('input-syn').value=item.syn||'';
   document.getElementById('input-ant').value=item.ant||'';
   document.getElementById('input-note').value=item.note||'';
-  document.getElementById('trans-box').style.display='none';
+  document.getElementById('trans-result').style.display='none';
   document.getElementById('modal-del-btn').style.display='block';
   document.querySelectorAll('.pos-tag').forEach(x=>x.classList.toggle('active',x.textContent===(item.pos||'')));
   setModalMode(t);
@@ -706,48 +806,55 @@ function closeOverlay(e){if(e.target===document.getElementById('overlay'))docume
 function tl(t){return{vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'}[t]||'';}
 function pickPos(el){document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
 
-// ── Translation via Netlify Function ──
-function onEnInput(){
-  clearTimeout(transTimer);
-  const v=document.getElementById('input-en').value.trim();
-  if(!v||v.length<2){document.getElementById('trans-box').style.display='none';return;}
-  document.getElementById('trans-box').style.display='flex';
-  document.getElementById('trans-inner').innerHTML='<div class="spinner"></div><span class="trans-label">AI 自動填入中...</span>';
-  transTimer=setTimeout(()=>fetchTrans(v),800);
-}
+// ── Manual translate button ──
+async function doTranslate(){
+  const word=document.getElementById('input-en').value.trim();
+  if(!word){showToast('請先輸入英文單字');return;}
 
-async function fetchTrans(word){
-  const w=word.toLowerCase().trim();
-  if(DC[w]!==undefined){applyTrans(DC[w]);return;}
+  const btn=document.getElementById('btn-translate');
+  const result=document.getElementById('trans-result');
+  btn.classList.add('loading');
+  btn.innerHTML='<div class="spinner"></div> 查詢中';
+  btn.disabled=true;
+  result.style.display='none';
+
+  const w=word.toLowerCase();
+  if(DC[w]){applyTrans(DC[w]);btn.classList.remove('loading');btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> 翻譯';btn.disabled=false;return;}
+
   try{
     const res=await fetch('/.netlify/functions/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word:w,type:etab})});
     if(!res.ok)throw new Error();
     const r=await res.json();
-    if(r.error)throw new Error(r.error);
+    if(r.error)throw new Error();
     r.examples=Array.isArray(r.examples)?r.examples:[];
     DC[w]=r;applyTrans(r);
   }catch{
     try{
-      const mm=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(w)}&langpair=en|zh-TW`);
+      const mm=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh-TW`);
       const mj=await mm.json();
       const r={zh:mj?.responseData?.translatedText||'',pos:'',syn:'',ant:'',examples:[]};
       DC[w]=r;applyTrans(r);
     }catch{
-      DC[w]=null;
-      document.getElementById('trans-inner').innerHTML='<span class="trans-label" style="color:var(--muted)">查無資料，請自行填入</span>';
+      showToast('翻譯失敗，請稍後再試');
     }
   }
+
+  btn.classList.remove('loading');
+  btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> 翻譯';
+  btn.disabled=false;
 }
 
 function applyTrans(r){
-  if(!r){document.getElementById('trans-inner').innerHTML='<span class="trans-label" style="color:var(--muted)">查無資料，請自行填入</span>';return;}
+  if(!r)return;
   if(!document.getElementById('input-zh').value&&r.zh)document.getElementById('input-zh').value=r.zh;
   if(r.pos)document.querySelectorAll('.pos-tag').forEach(t=>{if(t.textContent===r.pos)t.classList.add('active');});
   if(r.syn&&!document.getElementById('input-syn').value)document.getElementById('input-syn').value=r.syn;
   if(r.ant&&!document.getElementById('input-ant').value)document.getElementById('input-ant').value=r.ant;
   if(r.examples?.length){const g=etab==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((x,i)=>{if(!x.value&&r.examples[i])x.value=r.examples[i];});}
   const filled=[r.zh&&'中文',r.pos&&'詞性',r.syn&&'同義詞',r.ant&&'反義詞',r.examples?.length&&'例句'].filter(Boolean);
-  document.getElementById('trans-inner').innerHTML=`<span class="trans-label">✓ 已填入：${filled.join('、')}</span>`;
+  const result=document.getElementById('trans-result');
+  result.textContent=`已填入：${filled.join('、')}`;
+  result.style.display='block';
 }
 
 // ── Save / Delete ──
@@ -774,19 +881,43 @@ let qi=[],qx=0,qs=0,qr=[],qt='choice',qd='en2zh',ans=false;
 function allItems(){const sc=document.getElementById('quiz-scope').value;if(sc==='vocab')return(window._d.vocab||[]).map(i=>({...i,_t:'vocab'}));if(sc==='phrase')return(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}));return[...(window._d.vocab||[]).map(i=>({...i,_t:'vocab'})),...(window._d.phrase||[]).map(i=>({...i,_t:'phrase'}))];};
 function startQuiz(){const a=allItems();if(a.length<2){showToast('至少需要 2 筆學習內容');return;}qd=document.getElementById('quiz-direction').value;qt=document.getElementById('quiz-type').value;const cv=document.getElementById('quiz-count').value;const mx=cv==='all'?a.length:parseInt(cv);qi=[...a].sort(()=>Math.random()-0.5).slice(0,Math.min(mx,a.length));qx=0;qs=0;qr=[];document.getElementById('quiz-setup-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-active-area').style.display='block';renderQP();showQ();}
 function renderQP(){document.getElementById('quiz-progress').innerHTML=qi.map((_,i)=>`<div class="progress-dot ${i<qx?'done':i===qx?'current':''}"></div>`).join('');}
-function showQ(){ans=false;const item=qi[qx];document.getElementById('quiz-counter').textContent=`第 ${qx+1} 題 / ${qi.length}`;const ic=qt==='mixed'?Math.random()>0.5:qt==='choice';document.getElementById('quiz-prompt').textContent=qd==='en2zh'?'這個英文的中文意思是？':'這個中文對應的英文是？';document.getElementById('quiz-word').textContent=qd==='en2zh'?item.en:item.zh;document.getElementById('quiz-hint').textContent=qd==='en2zh'&&item.pos?item.pos:'';document.getElementById('quiz-feedback').style.display='none';document.getElementById('btn-next').style.display='none';const area=document.getElementById('quiz-answer-area');if(ic){const opts=[...allItems().filter(i=>i.id!==item.id).sort(()=>Math.random()-0.5).slice(0,3),item].sort(()=>Math.random()-0.5);area.innerHTML=`<div class="quiz-options">${opts.map(o=>`<button class="quiz-option" onclick="checkC(this,'${o.id}','${item.id}')">${esc(qd==='en2zh'?o.zh:o.en)}</button>`).join('')}</div>`;}else{area.innerHTML=`<input class="fill-input" id="fill-input" placeholder="${qd==='en2zh'?'輸入中文意思...':'輸入英文...'}" onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:10px" onclick="checkF()">確認答案</button>`;setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);}}
+function showQ(){ans=false;const item=qi[qx];document.getElementById('quiz-counter').textContent=`第 ${qx+1} 題 / ${qi.length}`;const ic=qt==='mixed'?Math.random()>0.5:qt==='choice';document.getElementById('quiz-prompt').textContent=qd==='en2zh'?'這個英文的中文意思是？':'這個中文對應的英文是？';document.getElementById('quiz-word').textContent=qd==='en2zh'?item.en:item.zh;document.getElementById('quiz-hint').textContent=qd==='en2zh'&&item.pos?item.pos:'';document.getElementById('quiz-feedback').style.display='none';document.getElementById('btn-next').style.display='none';const area=document.getElementById('quiz-answer-area');if(ic){const opts=[...allItems().filter(i=>i.id!==item.id).sort(()=>Math.random()-0.5).slice(0,3),item].sort(()=>Math.random()-0.5);area.innerHTML=`<div class="quiz-options">${opts.map(o=>`<button class="quiz-option" onclick="checkC(this,'${o.id}','${item.id}')">${esc(qd==='en2zh'?o.zh:o.en)}</button>`).join('')}</div>`;}else{area.innerHTML=`<input class="fill-input" id="fill-input" placeholder="${qd==='en2zh'?'輸入中文意思...':'輸入英文...'}" onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>`;setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);}}
 function checkC(btn,oid,cid){if(ans)return;ans=true;const ok=oid===cid;document.querySelectorAll('.quiz-option').forEach(b=>b.disabled=true);btn.classList.add(ok?'correct':'wrong');if(!ok){const cl=qd==='en2zh'?qi[qx].zh:qi[qx].en;document.querySelectorAll('.quiz-option').forEach(b=>{if(b.textContent===cl)b.classList.add('correct');});}showFB(ok,qi[qx]);}
 function checkF(){if(ans)return;const inp=document.getElementById('fill-input');if(!inp)return;ans=true;const ua=inp.value.trim().toLowerCase();const item=qi[qx];const cor=(qd==='en2zh'?item.zh:item.en).toLowerCase();const ok=ua===cor||(cor.includes(ua)&&ua.length>2);inp.classList.add(ok?'correct':'wrong');inp.disabled=true;showFB(ok,item);}
-function showFB(ok,item){if(ok)qs++;qr.push({item,correct:ok});const fb=document.getElementById('quiz-feedback');fb.style.display='block';fb.className='quiz-feedback '+(ok?'correct':'wrong');fb.textContent=ok?'✓ 答對了！':`✕ 正確答案：${qd==='en2zh'?item.zh:item.en}`;const bn=document.getElementById('btn-next');bn.style.display='block';bn.textContent=qx<qi.length-1?'下一題 →':'查看結果 →';}
+function showFB(ok,item){if(ok)qs++;qr.push({item,correct:ok});const fb=document.getElementById('quiz-feedback');fb.style.display='block';fb.className='quiz-feedback '+(ok?'correct':'wrong');fb.textContent=ok?'答對了！':`正確答案：${qd==='en2zh'?item.zh:item.en}`;const bn=document.getElementById('btn-next');bn.style.display='block';bn.textContent=qx<qi.length-1?'下一題 →':'查看結果 →';}
 function nextQuestion(){qx++;if(qx>=qi.length)showResult();else{renderQP();showQ();}}
-function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容 🎉']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:14px">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();calVY=undefined;calVM=undefined;renderCal();}
+function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:13px;font-weight:600;color:${r.correct?'var(--green-dark)':'var(--red)'}">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();calVY=undefined;calVM=undefined;renderCal();}
 
-// ── Checkin & Calendar ──
+// ── Calendar ──
 let calVY,calVM;
 function todayKey(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function recordCheckin(){if(!window._d.checkins)window._d.checkins={};const k=todayKey();if(!window._d.checkins[k]){window._d.checkins[k]={ts:Date.now(),score:qs,total:qi.length};save();showToast('打卡成功！今天全部答對 ✓');}}
+function recordCheckin(){if(!window._d.checkins)window._d.checkins={};const k=todayKey();if(!window._d.checkins[k]){window._d.checkins[k]={ts:Date.now(),score:qs,total:qi.length};save();showToast('打卡成功！全部答對');}}
 function calcStreak(){const c=window._d.checkins||{};let s=0;const d=new Date();while(true){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(c[k]){s++;d.setDate(d.getDate()-1);}else break;}return s;}
-function renderCal(){const now=new Date();if(calVY===undefined){calVY=now.getFullYear();calVM=now.getMonth();}const c=window._d.checkins||{};const mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];document.getElementById('cal-month-label').textContent=`${calVY} 年 ${mn[calVM]}`;const st=calcStreak();const sel=document.getElementById('cal-streak');sel.textContent=st>0?`🔥 連續 ${st} 天`:'完成全部題目可打卡';sel.style.background=st>0?'var(--accent-light)':'var(--faint)';sel.style.color=st>0?'var(--accent)':'var(--muted)';const fd=new Date(calVY,calVM,1).getDay();const dim=new Date(calVY,calVM+1,0).getDate();const ts=todayKey();const isCur=(calVY===now.getFullYear()&&calVM===now.getMonth());let html='';for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';for(let d=1;d<=dim;d++){const k=`${calVY}-${String(calVM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const chk=!!c[k];const idt=k===ts;html+=`<div class="cal-day has-date${chk?' checked':''}${idt?' today':''}">${d}</div>`;}document.getElementById('cal-grid').innerHTML=html;const cd=Object.keys(c).filter(k=>k.startsWith(`${calVY}-${String(calVM+1).padStart(2,'0')}`)).length;document.getElementById('cal-note').textContent=cd>0?`本月已打卡 ${cd} 天`:isCur?'本月還沒有打卡紀錄':'這個月沒有打卡紀錄';}
+function renderCal(){
+  const now=new Date();
+  if(calVY===undefined){calVY=now.getFullYear();calVM=now.getMonth();}
+  const c=window._d.checkins||{};
+  const mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('cal-month-label').textContent=`${calVY} 年 ${mn[calVM]}`;
+  const st=calcStreak();
+  const sel=document.getElementById('cal-streak');
+  if(st>0){sel.textContent=`連續 ${st} 天`;sel.style.display='inline-flex';}
+  else{sel.style.display='none';}
+  const fd=new Date(calVY,calVM,1).getDay();
+  const dim=new Date(calVY,calVM+1,0).getDate();
+  const ts=todayKey();
+  let html='';
+  for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
+  for(let d=1;d<=dim;d++){
+    const k=`${calVY}-${String(calVM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const chk=!!c[k];const idt=k===ts;
+    html+=`<div class="cal-day has-date${chk?' checked':''}${idt?' today':''}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  const cd=Object.keys(c).filter(k=>k.startsWith(`${calVY}-${String(calVM+1).padStart(2,'0')}`)).length;
+  const isCur=(calVY===now.getFullYear()&&calVM===now.getMonth());
+  document.getElementById('cal-note').textContent=cd>0?`本月已打卡 ${cd} 天`:isCur?'本月尚未打卡':'這個月沒有打卡紀錄';
+}
 function calPrev(){if(calVM===undefined)return;calVM--;if(calVM<0){calVM=11;calVY--;}renderCal();}
 function calNext(){if(calVM===undefined)return;const now=new Date();if(calVY===now.getFullYear()&&calVM===now.getMonth())return;calVM++;if(calVM>11){calVM=0;calVY++;}renderCal();}
 function endQuiz(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-setup-area').style.display='block';calVY=undefined;calVM=undefined;}
