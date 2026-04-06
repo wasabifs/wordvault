@@ -388,7 +388,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{getFirestore,doc,getDoc,setDoc,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const cfg={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",storageBucket:"YOUR_PROJECT.appspot.com",messagingSenderId:"YOUR_SENDER_ID",appId:"YOUR_APP_ID"};
+const cfg={apiKey:"AIzaSyBaaNnLCD3M_bltg0ajiUeLC0LO2Rx9EGQ",authDomain:"wordvault-27253.firebaseapp.com",projectId:"wordvault-27253",storageBucket:"wordvault-27253.firebasestorage.app",messagingSenderId:"270612506152",appId:"1:270612506152:web:410a38762a5ff671fc771d"};
 const DEMO=cfg.apiKey==="YOUR_API_KEY";
 let app,auth,db,user=null,unsub=null;
 if(!DEMO){app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,u=>{if(u){user=u;hideLogo();setupSync(u);}});}
