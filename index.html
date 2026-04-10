@@ -428,6 +428,72 @@ body{
 /* ── Calendar always visible in quiz setup ── */
 .cal-always{margin-top:16px;}
 
+/* ── Phonetic / IPA ── */
+.detail-phonetic{font-size:16px;color:var(--muted);font-weight:400;margin-bottom:6px;letter-spacing:0.3px;}
+.detail-tense{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+.tense-item{font-size:12px;background:var(--faint);border-radius:6px;padding:3px 10px;color:var(--ink2);}
+.tense-label{font-weight:600;color:var(--muted);margin-right:3px;}
+
+/* ── Audio button ── */
+.btn-audio{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 13px 5px 10px;
+  border-radius:99px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  color:var(--accent);
+  font-size:13px;font-weight:600;
+  cursor:pointer;
+  font-family:'Inter',sans-serif;
+  margin-bottom:14px;
+  transition:background 0.12s;
+}
+.btn-audio:active{background:var(--accent-light);}
+.btn-audio svg{flex-shrink:0;}
+
+/* ── Tags ── */
+.tag-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;padding:3px 10px;border-radius:99px;
+  background:var(--accent-light);color:var(--accent);
+  font-weight:600;cursor:default;
+}
+.tag-chip .tag-del{cursor:pointer;font-size:14px;line-height:1;color:var(--accent);opacity:0.6;}
+.tag-chip .tag-del:hover{opacity:1;}
+.tag-input-wrap{display:flex;gap:6px;align-items:center;margin-top:6px;}
+.tag-input-wrap input{
+  flex:1;padding:7px 10px;border-radius:var(--r-sm);
+  border:none;box-shadow:0 0 0 1px var(--border);
+  font-size:13px;font-family:'Inter',sans-serif;color:var(--ink);
+  background:var(--card);outline:none;
+}
+.tag-input-wrap input:focus{box-shadow:0 0 0 2px var(--accent);}
+.tag-input-wrap button{
+  padding:7px 12px;border-radius:var(--r-sm);
+  background:var(--accent);color:white;
+  border:none;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.preset-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.preset-tag{
+  font-size:12px;padding:3px 10px;border-radius:99px;
+  border:1.5px solid var(--border);background:var(--card);
+  color:var(--muted);cursor:pointer;font-weight:500;
+}
+.preset-tag.selected{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600;}
+.tag-filter-row{display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.tag-filter-row::-webkit-scrollbar{display:none;}
+.tag-filter-btn{
+  flex-shrink:0;padding:4px 12px;border-radius:99px;
+  font-size:12px;font-weight:600;border:1.5px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;
+}
+.tag-filter-btn.active{background:var(--accent);color:white;border-color:var(--accent);}
+.detail-tag-chip{
+  font-size:12px;padding:3px 11px;border-radius:99px;
+  background:var(--accent-light);color:var(--accent);font-weight:600;
+}
+
 </style>
 </head>
 <body>
@@ -473,6 +539,7 @@ body{
       <button class="filter-tab f-known" onclick="setFilter('known')">認識</button>
       <button class="filter-tab f-mastered" onclick="setFilter('mastered')">熟悉</button>
     </div>
+    <div class="tag-filter-row" id="tag-filter-row" style="margin-bottom:10px;display:none"></div>
   </div>
 
   <!-- Scroll content -->
@@ -609,6 +676,15 @@ body{
       <div class="field" id="pos-field"><div class="field-label">詞性</div><div class="pos-picker"><span class="pos-tag" onclick="pickPos(this)">n.</span><span class="pos-tag" onclick="pickPos(this)">v.</span><span class="pos-tag" onclick="pickPos(this)">adj.</span><span class="pos-tag" onclick="pickPos(this)">adv.</span><span class="pos-tag" onclick="pickPos(this)">phr.</span><span class="pos-tag" onclick="pickPos(this)">其他</span></div></div>
 
       <div id="vocab-extra">
+        <div class="field"><div class="field-label">音標（IPA）</div><input class="field-input" id="input-phonetic" placeholder="翻譯後自動填入，e.g. /rɪˈzɪliəns/"></div>
+        <div class="field" id="tense-field"><div class="field-label">動詞時態（v. 時自動填入）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <input class="field-input" id="input-tense-past" placeholder="過去式">
+            <input class="field-input" id="input-tense-pp" placeholder="過去分詞">
+            <input class="field-input" id="input-tense-ing" placeholder="現在分詞">
+            <input class="field-input" id="input-tense-3sg" placeholder="第三人稱單數">
+          </div>
+        </div>
         <div class="field"><div class="field-label">同義詞（逗號分隔）</div><input class="field-input" id="input-syn" placeholder="e.g. strong, tough"></div>
         <div class="field"><div class="field-label">反義詞（逗號分隔）</div><input class="field-input" id="input-ant" placeholder="e.g. fragile, weak"></div>
         <div class="field"><div class="field-label">例句（至少三則）</div>
@@ -626,6 +702,14 @@ body{
             <div class="example-row"><span class="example-num">2</span><textarea class="field-textarea" rows="2" placeholder="第二則例句..."></textarea></div>
             <div class="example-row"><span class="example-num">3</span><textarea class="field-textarea" rows="2" placeholder="第三則例句..."></textarea></div>
           </div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">標籤</div>
+        <div class="preset-tags" id="preset-tags-wrap"></div>
+        <div id="selected-tags-wrap" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px"></div>
+        <div class="tag-input-wrap">
+          <input id="tag-custom-input" placeholder="自訂標籤..." onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}">
+          <button onclick="addCustomTag()">新增</button>
         </div>
       </div>
       <div class="field"><div class="field-label">個人筆記（選填）</div><textarea class="field-textarea" id="input-note" rows="2" placeholder="在哪裡看到？有什麼聯想？..."></textarea></div>
@@ -717,7 +801,7 @@ function getSelectedFam(){
 }
 
 function switchTab(t,l){
-  tab=t;filterFam='all';
+  tab=t;filterFam='all';filterTag='';
   ['vocab','phrase','grammar','pattern','quiz'].forEach(x=>{
     document.getElementById('page-'+x).style.display=x===t?'block':'none';
     const tb=document.getElementById('tab-'+x);
@@ -764,7 +848,8 @@ function openDetail(t,id){
 
   const posBadge=item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}" style="display:inline-block;margin-bottom:12px">${item.pos}</span>`:'';
   const exArr=Array.isArray(item.examples)?item.examples.filter(Boolean):(item.example?[item.example]:[]);
-  const exHtml=exArr.length?`<div class="detail-section"><div class="detail-section-title">例句</div>${exArr.map((ex,i)=>`<div class="example-card"><div class="example-card-num">例句 ${i+1}</div><div class="example-card-en">${esc(ex)}</div><div class="example-card-zh" id="exzh-${id}-${i}">翻譯中...</div></div>`).join('')}</div>`:'';
+  const exZhArr=Array.isArray(item.examples_zh)?item.examples_zh:[];
+  const exHtml=exArr.length?`<div class="detail-section"><div class="detail-section-title">例句</div>${exArr.map((ex,i)=>`<div class="example-card"><div class="example-card-num">例句 ${i+1}</div><div class="example-card-en">${esc(ex)}</div>${exZhArr[i]?`<div class="example-card-zh">${esc(exZhArr[i])}</div>`:''}</div>`).join('')}</div>`:'';
   const synChips=t==='vocab'&&item.syn?item.syn.split(',').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="chip syn">${esc(s)}</span>`).join(''):'';
   const antChips=t==='vocab'&&item.ant?item.ant.split(',').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="chip ant">${esc(s)}</span>`).join(''):'';
 
@@ -772,29 +857,22 @@ function openDetail(t,id){
     <div class="detail-wrap">
       ${posBadge}
       <div class="detail-en">${esc(item.en)}</div>
+      ${item.phonetic?`<div class="detail-phonetic">${esc(item.phonetic)}</div>`:''}
+      <button class="btn-audio" onclick="playAudio('${esc(item.en)}')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        發音
+      </button>
       <div class="detail-zh">${esc(item.zh)}</div>
+      ${item.tense&&Object.values(item.tense||{}).some(Boolean)&&t==='vocab'?`<div class="detail-section"><div class="detail-section-title">動詞時態</div><div class="detail-tense">${[['過去式',item.tense?.past],['過去分詞',item.tense?.pp],['現在分詞',item.tense?.ing],['第三人稱單數',item.tense?.sg3]].filter(([,v])=>v).map(([l,v])=>`<span class="tense-item"><span class="tense-label">${l}</span>${esc(v)}</span>`).join('')}</div></div>`:''}
       ${synChips?`<div class="detail-section"><div class="detail-section-title">同義詞</div><div class="chip-row">${synChips}</div></div>`:''}
       ${antChips?`<div class="detail-section"><div class="detail-section-title">反義詞</div><div class="chip-row">${antChips}</div></div>`:''}
       ${exHtml}
+      ${Array.isArray(item.tags)&&item.tags.length?`<div class="detail-section"><div class="detail-section-title">標籤</div><div class="chip-row">${item.tags.map(tg=>`<span class="detail-tag-chip">${esc(tg)}</span>`).join('')}</div></div>`:''}
       ${item.note?`<div class="detail-section"><div class="detail-section-title">個人筆記</div><div class="detail-note">${esc(item.note)}</div></div>`:''}
     </div>
   `;
-  if(exArr.length)translateExamples(exArr,id);
   document.getElementById('detail-edit-btn').onclick=()=>openEditModal(t,id);
   document.getElementById('detail-del-btn').onclick=()=>{if(!confirm(`確定刪除「${item.en}」？`))return;window._d[t]=window._d[t].filter(i=>i.id!==id);save();showToast('已刪除');goHome();};
-}
-
-async function translateExamples(examples,id){
-  for(let i=0;i<examples.length;i++){
-    const el=document.getElementById(`exzh-${id}-${i}`);
-    if(!el)continue;
-    try{
-      const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(examples[i])}&langpair=en|zh-TW`);
-      const j=await res.json();
-      const zh=j?.responseData?.translatedText||'';
-      if(el)el.textContent=zh||'';
-    }catch{if(el)el.textContent='';}
-  }
 }
 
 function goHome(){
@@ -802,6 +880,7 @@ function goHome(){
   const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
   titleRow.innerHTML=`<span class="topbar-title" id="page-title">${lb[tab]||'WordVault'}</span>`;
   document.getElementById('filter-tabs').style.display='flex';
+  document.getElementById('tag-filter-row').style.display='';
   switchTab(tab,lb[tab]);
 }
 
@@ -816,6 +895,7 @@ function renderList(){
   const cfg=cfgs[tab];if(!cfg)return;
   let items=(window._d[tab]||[]).filter(i=>!q||i.en.toLowerCase().includes(q)||(i.zh||'').includes(q));
   if(filterFam!=='all')items=items.filter(i=>(i.fam||'unknown')===filterFam);
+  if(filterTag)items=items.filter(i=>Array.isArray(i.tags)&&i.tags.includes(filterTag));
 
   const famClass=(f)=>f==='known'?'fam-known':f==='mastered'?'fam-mastered':'fam-unknown';
 
@@ -825,15 +905,21 @@ function renderList(){
         <div class="word-en">${esc(item.en)}</div>
         <div class="word-zh">${esc(item.zh)}</div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
+        ${Array.isArray(item.tags)&&item.tags.length?`<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px">${item.tags.slice(0,2).map(tg=>`<span style="font-size:10px;padding:1px 7px;border-radius:99px;background:var(--accent-light);color:var(--accent);font-weight:600">${esc(tg)}</span>`).join('')}${item.tags.length>2?`<span style="font-size:10px;color:var(--muted)">+${item.tags.length-2}</span>`:''}</div>`:''}
       </div>`).join('');
   }else{
     document.getElementById(cfg.g).innerHTML=items.map((item,idx)=>`
       <div class="list-card ${famClass(item.fam||'unknown')}" style="animation-delay:${idx*0.03}s" onclick="openDetail('${tab}','${item.id}')">
-        <div class="list-card-body"><div class="list-en">${esc(item.en)}</div><div class="list-zh">${esc(item.zh)}</div></div>
+        <div class="list-card-body">
+          <div class="list-en">${esc(item.en)}</div>
+          <div class="list-zh">${esc(item.zh)}</div>
+          ${Array.isArray(item.tags)&&item.tags.length?`<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${item.tags.slice(0,3).map(tg=>`<span style="font-size:10px;padding:1px 7px;border-radius:99px;background:var(--accent-light);color:var(--accent);font-weight:600">${esc(tg)}</span>`).join('')}${item.tags.length>3?`<span style="font-size:10px;color:var(--muted)">+${item.tags.length-3}</span>`:''}</div>`:''}
+        </div>
         ${item.pos?`<span class="pos-badge pos-${item.pos.replace('.','').replace('其他','other')}">${item.pos}</span>`:''}
       </div>`).join('');
   }
   document.getElementById(cfg.e).style.display=items.length?'none':'block';
+  renderTagFilter();
 }
 
 // ── Modal ──
@@ -842,12 +928,13 @@ const DC={};
 function openAddModal(){
   eid=null;etab=tab;
   document.getElementById('modal-title').textContent=`新增${tl(tab)}`;
-  ['input-en','input-zh','input-syn','input-ant','input-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['input-en','input-zh','input-syn','input-ant','input-note','input-phonetic','input-tense-past','input-tense-pp','input-tense-ing','input-tense-3sg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('trans-result').style.display='none';
   document.getElementById('trans-result').textContent='';
   document.getElementById('modal-del-btn').style.display='none';
   document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
+  selectedTags=[];renderTagsUI();
   setModalMode(tab);clearEx();
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('input-en').focus(),350);
@@ -862,6 +949,13 @@ function openEditModal(t,id){
   document.getElementById('input-syn').value=item.syn||'';
   document.getElementById('input-ant').value=item.ant||'';
   document.getElementById('input-note').value=item.note||'';
+  // New fields
+  if(document.getElementById('input-phonetic'))document.getElementById('input-phonetic').value=item.phonetic||'';
+  if(document.getElementById('input-tense-past'))document.getElementById('input-tense-past').value=item.tense?.past||'';
+  if(document.getElementById('input-tense-pp'))document.getElementById('input-tense-pp').value=item.tense?.pp||'';
+  if(document.getElementById('input-tense-ing'))document.getElementById('input-tense-ing').value=item.tense?.ing||'';
+  if(document.getElementById('input-tense-3sg'))document.getElementById('input-tense-3sg').value=item.tense?.sg3||'';
+  selectedTags=Array.isArray(item.tags)?[...item.tags]:[];renderTagsUI();
   document.getElementById('trans-result').style.display='none';
   document.getElementById('modal-del-btn').style.display='block';
   document.querySelectorAll('.pos-tag').forEach(x=>x.classList.toggle('active',x.textContent===(item.pos||'')));
@@ -880,13 +974,22 @@ function setModalMode(t){
   document.getElementById('pos-field').style.display=t==='grammar'?'none':'block';
   document.getElementById('vocab-extra').style.display=t==='vocab'?'block':'none';
   document.getElementById('phrase-extra').style.display=t==='phrase'?'block':'none';
+  // tense field only shows for vocab when verb is selected
+  const tenseField=document.getElementById('tense-field');
+  if(tenseField)tenseField.style.display='none';
+}
+// Show/hide tense on pos pick
+function pickPos(el){
+  document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const tf=document.getElementById('tense-field');
+  if(tf&&etab==='vocab')tf.style.display=el.textContent==='v.'?'block':'none';
 }
 function clearEx(){['vocab-examples','phrase-examples'].forEach(g=>document.querySelectorAll(`#${g} textarea`).forEach(r=>r.value=''));}
 function fillEx(t,arr){const g=t==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((r,i)=>r.value=arr[i]||'');}
 function getEx(t){const g=t==='phrase'?'phrase-examples':'vocab-examples';return Array.from(document.querySelectorAll(`#${g} textarea`)).map(r=>r.value.trim()).filter(Boolean);}
 function closeOverlay(e){if(e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('open');}
 function tl(t){return{vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'}[t]||'';}
-function pickPos(el){document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
 
 // ── Manual translate button ──
 async function doTranslate(){
@@ -910,25 +1013,17 @@ async function doTranslate(){
       r=await res.json();
       if(r.error)throw new Error();
       r.examples=Array.isArray(r.examples)?r.examples:[];
+      r.examples_zh=Array.isArray(r.examples_zh)?r.examples_zh:[];
       DC[w]=r;
     }
     applyTrans(r);
 
-    // After filling English examples, translate each one to Chinese inline
-    if(r.examples?.length){
-      const g=etab==='phrase'?'phrase-examples':'vocab-examples';
-      const textareas=document.querySelectorAll(`#${g} textarea`);
-      translateExamplesInline(r.examples, textareas);
+    // Show Chinese hints below example textareas using Claude's examples_zh (no MyMemory needed)
+    if(r.examples_zh?.length){
+      applyExamplesZhHints(r.examples_zh);
     }
   }catch{
-    try{
-      const mm=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh-TW`);
-      const mj=await mm.json();
-      const r={zh:mj?.responseData?.translatedText||'',pos:'',syn:'',ant:'',examples:[]};
-      DC[w]=r;applyTrans(r);
-    }catch{
-      showToast('翻譯失敗，請稍後再試');
-    }
+    showToast('翻譯失敗，請稍後再試');
   }
 
   btn.classList.remove('loading');
@@ -936,40 +1031,41 @@ async function doTranslate(){
   btn.disabled=false;
 }
 
-async function translateExamplesInline(examples, textareas){
-  // Translate each English example and append Chinese below in the textarea placeholder area
-  // We show Chinese as a hint below each textarea using a sibling element
-  const g = etab==='phrase'?'phrase-examples':'vocab-examples';
-  const rows = document.querySelectorAll(`#${g} .example-row`);
-
-  for(let i=0;i<examples.length&&i<rows.length;i++){
-    // Remove existing hint if any
-    const existing = rows[i].querySelector('.example-zh-hint');
-    if(existing) existing.remove();
-
-    try{
-      const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(examples[i])}&langpair=en|zh-TW`);
-      const j=await res.json();
-      const zh=j?.responseData?.translatedText||'';
-      if(zh){
-        const hint=document.createElement('div');
-        hint.className='example-zh-hint';
-        hint.style.cssText='font-size:11px;color:var(--muted);margin-top:3px;padding-left:0;line-height:1.5;font-style:italic;';
-        hint.textContent=zh;
-        rows[i].appendChild(hint);
-      }
-    }catch{}
-  }
+// Show Chinese hints below example textareas in the add/edit modal
+function applyExamplesZhHints(examples_zh){
+  const g=etab==='phrase'?'phrase-examples':'vocab-examples';
+  const rows=document.querySelectorAll(`#${g} .example-row`);
+  rows.forEach((row,i)=>{
+    const existing=row.querySelector('.example-zh-hint');
+    if(existing)existing.remove();
+    if(examples_zh[i]){
+      const hint=document.createElement('div');
+      hint.className='example-zh-hint';
+      hint.style.cssText='font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;font-style:italic;';
+      hint.textContent=examples_zh[i];
+      row.appendChild(hint);
+    }
+  });
 }
 
 function applyTrans(r){
   if(!r)return;
   if(!document.getElementById('input-zh').value&&r.zh)document.getElementById('input-zh').value=r.zh;
-  if(r.pos)document.querySelectorAll('.pos-tag').forEach(t=>{if(t.textContent===r.pos)t.classList.add('active');});
+  if(r.pos)document.querySelectorAll('.pos-tag').forEach(t=>{if(t.textContent===r.pos){t.classList.add('active');const tf=document.getElementById('tense-field');if(tf&&etab==='vocab')tf.style.display=r.pos==='v.'?'block':'none';}});
   if(r.syn&&!document.getElementById('input-syn').value)document.getElementById('input-syn').value=r.syn;
   if(r.ant&&!document.getElementById('input-ant').value)document.getElementById('input-ant').value=r.ant;
   if(r.examples?.length){const g=etab==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((x,i)=>{if(!x.value&&r.examples[i])x.value=r.examples[i];});}
-  const filled=[r.zh&&'中文',r.pos&&'詞性',r.syn&&'同義詞',r.ant&&'反義詞',r.examples?.length&&'例句'].filter(Boolean);
+  // Phonetic
+  const phoEl=document.getElementById('input-phonetic');
+  if(phoEl&&!phoEl.value&&r.phonetic)phoEl.value=r.phonetic;
+  // Tense
+  if(r.tense){
+    ['past','pp','ing','sg3'].forEach(k=>{
+      const el=document.getElementById(k==='past'?'input-tense-past':k==='pp'?'input-tense-pp':k==='ing'?'input-tense-ing':'input-tense-3sg');
+      if(el&&!el.value&&r.tense[k])el.value=r.tense[k];
+    });
+  }
+  const filled=[r.zh&&'中文',r.pos&&'詞性',r.phonetic&&'音標',r.syn&&'同義詞',r.ant&&'反義詞',r.examples?.length&&'例句'].filter(Boolean);
   const result=document.getElementById('trans-result');
   result.textContent=`已填入：${filled.join('、')}`;
   result.style.display='block';
@@ -985,11 +1081,24 @@ function saveEntry(){
   const syn=document.getElementById('input-syn').value.trim();
   const ant=document.getElementById('input-ant').value.trim();
   const examples=getEx(etab);
+  // Collect examples_zh from the modal hints
+  const g=etab==='phrase'?'phrase-examples':'vocab-examples';
+  const exRows=document.querySelectorAll(`#${g} .example-row`);
+  const examples_zh=Array.from(exRows).map(row=>(row.querySelector('.example-zh-hint')?.textContent||'').trim());
   const note=document.getElementById('input-note').value.trim();
   const fam=getSelectedFam()||'unknown';
+  // New fields
+  const phonetic=(document.getElementById('input-phonetic')?.value||'').trim();
+  const tense={
+    past:(document.getElementById('input-tense-past')?.value||'').trim(),
+    pp:(document.getElementById('input-tense-pp')?.value||'').trim(),
+    ing:(document.getElementById('input-tense-ing')?.value||'').trim(),
+    sg3:(document.getElementById('input-tense-3sg')?.value||'').trim()
+  };
+  const tags=getSelectedTags();
   const now=Date.now();
-  if(eid){const arr=window._d[etab];const i=arr.findIndex(x=>x.id===eid);if(i>=0)arr[i]={...arr[i],en,zh,pos,syn,ant,examples,note,fam,updatedAt:now};showToast('已更新');}
-  else{if(!window._d[etab])window._d[etab]=[];window._d[etab].unshift({id:uid(),en,zh,pos,syn,ant,examples,note,fam,createdAt:now});showToast('已新增');}
+  if(eid){const arr=window._d[etab];const i=arr.findIndex(x=>x.id===eid);if(i>=0)arr[i]={...arr[i],en,zh,pos,syn,ant,examples,examples_zh,note,fam,phonetic,tense,tags,updatedAt:now};showToast('已更新');}
+  else{if(!window._d[etab])window._d[etab]=[];window._d[etab].unshift({id:uid(),en,zh,pos,syn,ant,examples,examples_zh,note,fam,phonetic,tense,tags,createdAt:now});showToast('已新增');}
   save();document.getElementById('overlay').classList.remove('open');
   if(eid)openDetail(etab,eid);else renderList();
 }
@@ -1055,6 +1164,77 @@ let dp=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('install-banner').classList.add('visible');});
 window.installPWA=async function(){if(!dp)return;dp.prompt();const{outcome}=await dp.userChoice;dp=null;document.getElementById('install-banner').classList.remove('visible');if(outcome==='accepted')showToast('已加入主畫面！');};
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+// ── Tag system ──
+const PRESET_TAGS=['旅遊','商業','學術','日常','科技','食物','情感','時事'];
+let selectedTags=[];
+let filterTag='';
+
+function renderTagsUI(){
+  const presetWrap=document.getElementById('preset-tags-wrap');
+  const selWrap=document.getElementById('selected-tags-wrap');
+  if(!presetWrap||!selWrap)return;
+  presetWrap.innerHTML=PRESET_TAGS.map(tg=>`<span class="preset-tag${selectedTags.includes(tg)?' selected':''}" onclick="togglePresetTag('${tg}')">${tg}</span>`).join('');
+  selWrap.innerHTML=selectedTags.filter(tg=>!PRESET_TAGS.includes(tg)).map(tg=>`<span class="tag-chip">${esc(tg)}<span class="tag-del" onclick="removeTag(this,'${esc(tg)}')">×</span></span>`).join('');
+}
+function togglePresetTag(tg){
+  if(selectedTags.includes(tg))selectedTags=selectedTags.filter(x=>x!==tg);
+  else selectedTags.push(tg);
+  renderTagsUI();
+}
+function addCustomTag(){
+  const inp=document.getElementById('tag-custom-input');
+  if(!inp)return;
+  const v=inp.value.trim();
+  if(!v||v.length>20){if(v.length>20)showToast('標籤最多 20 字');return;}
+  if(!selectedTags.includes(v))selectedTags.push(v);
+  inp.value='';renderTagsUI();
+}
+function removeTag(el,tg){selectedTags=selectedTags.filter(x=>x!==tg);renderTagsUI();}
+function getSelectedTags(){return[...selectedTags];}
+
+function renderTagFilter(){
+  const row=document.getElementById('tag-filter-row');
+  if(!row)return;
+  const items=window._d[tab]||[];
+  const allTags=[...new Set(items.flatMap(i=>Array.isArray(i.tags)?i.tags:[]))].sort();
+  if(!allTags.length){row.style.display='none';return;}
+  row.style.display='flex';
+  row.innerHTML=`<button class="tag-filter-btn${filterTag===''?' active':''}" onclick="setTagFilter('')">全部</button>`+
+    allTags.map(tg=>`<button class="tag-filter-btn${filterTag===tg?' active':''}" onclick="setTagFilter('${esc(tg)}')">${esc(tg)}</button>`).join('');
+}
+function setTagFilter(tg){filterTag=tg;renderTagFilter();renderList();}
+
+// ── Audio playback ──
+async function playAudio(word){
+  try{
+    const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if(!res.ok)throw new Error('no dict');
+    const data=await res.json();
+    let audioUrl='';
+    for(const entry of data){
+      for(const phon of(entry.phonetics||[])){
+        if(!phon.audio)continue;
+        audioUrl=phon.audio.startsWith('http')?phon.audio:'https:'+phon.audio;
+        break;
+      }
+      if(audioUrl)break;
+    }
+    if(audioUrl){
+      const a=new Audio(audioUrl);
+      a.play().catch(()=>fallbackTTS(word));
+      return;
+    }
+    throw new Error('no url');
+  }catch{fallbackTTS(word);}
+}
+function fallbackTTS(word){
+  if('speechSynthesis'in window){
+    const u=new SpeechSynthesisUtterance(word);
+    u.lang='en-US';u.rate=0.9;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }else{showToast('無法播放發音');}
+}
 
 loadLocal();
 </script>
