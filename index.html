@@ -1105,7 +1105,7 @@ async function doTranslate(){
   try{
     let r=DC[w];
     if(!r){
-      const res=await fetch('/.netlify/functions/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word:w,type:etab})});
+      const res=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word:w,type:etab})});
       if(!res.ok)throw new Error();
       r=await res.json();
       if(r.error)throw new Error();
