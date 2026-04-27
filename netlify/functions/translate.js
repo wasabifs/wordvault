@@ -1,13 +1,13 @@
-// netlify/functions/translate.js
+// api/translate.js  ← Vercel Serverless Function
 // Updated: added phonetic, tense, and examples_zh (no more MyMemory dependency)
 
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { word, type } = JSON.parse(event.body || '{}');
-  if (!word) return { statusCode: 400, body: JSON.stringify({ error: 'missing word' }) };
+  const { word, type } = req.body || {};
+  if (!word) return res.status(400).json({ error: 'missing word' });
 
   const systemPrompt = `You are an English dictionary assistant. Always respond with valid JSON only. No markdown, no explanation, no code fences.`;
 
@@ -62,16 +62,9 @@ exports.handler = async (event) => {
     const clean = text.replace(/```json|```/gi, '').trim();
     const result = JSON.parse(clean);
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(result),
-    };
+    return res.status(200).json(result);
   } catch (err) {
     console.error('translate error:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'translation failed' }),
-    };
+    return res.status(500).json({ error: 'translation failed' });
   }
-};
+}
