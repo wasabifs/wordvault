@@ -347,24 +347,24 @@ body{
 .result-row.fail{background:var(--red-light);}
 
 /* ── Calendar (orange dot style) ── */
-.cal-wrap{margin-top:20px;border-top:0.5px solid var(--border);padding-top:18px;}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.cal-title-row{display:flex;align-items:center;gap:6px;}
-.cal-title{font-size:15px;font-weight:600;color:var(--ink);}
+.cal-wrap{margin-top:14px;border-top:0.5px solid var(--border);padding-top:12px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cal-title-row{display:flex;align-items:center;gap:4px;}
+.cal-title{font-size:13px;font-weight:600;color:var(--ink);}
 .cal-nav{
-  width:28px;height:28px;border-radius:99px;
+  width:22px;height:22px;border-radius:99px;
   border:none;background:var(--faint);
-  color:var(--muted);font-size:14px;cursor:pointer;
+  color:var(--muted);font-size:12px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
 }
-.cal-streak{font-size:12px;font-weight:600;color:var(--orange);background:var(--orange-light);padding:3px 9px;border-radius:99px;}
-.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
-.cal-weekday{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:3px 0;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-streak{font-size:10px;font-weight:600;color:var(--orange);background:var(--orange-light);padding:2px 7px;border-radius:99px;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
+.cal-weekday{text-align:center;font-size:9px;font-weight:500;color:var(--muted);padding:2px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-day{
   aspect-ratio:1;
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:var(--muted);
+  font-size:10px;color:var(--muted);
   border-radius:50%;
   position:relative;
 }
@@ -377,10 +377,10 @@ body{
 .cal-day.checked::after{
   content:'';
   position:absolute;
-  width:6px;height:6px;
+  width:4px;height:4px;
   background:white;
   border-radius:50%;
-  bottom:4px;
+  bottom:3px;
   opacity:0.7;
   display:none;
 }
@@ -389,7 +389,7 @@ body{
   color:var(--orange);
   font-weight:600;
 }
-.cal-note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
+.cal-note{font-size:10px;color:var(--muted);text-align:center;margin-top:6px;}
 
 /* ── Toast ── */
 .toast{
@@ -440,6 +440,18 @@ body{
 
 /* ── Calendar always visible in quiz setup ── */
 .cal-always{margin-top:16px;}
+
+/* ── Wrong answers log ── */
+.wrong-log-wrap{margin-top:14px;border-top:0.5px solid var(--border);padding-top:12px;}
+.wrong-log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.wrong-log-title{font-size:13px;font-weight:600;color:var(--ink);}
+.wrong-log-count{font-size:10px;font-weight:600;color:var(--red);background:var(--red-light);padding:2px 7px;border-radius:99px;}
+.wrong-log-clear{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;}
+.wrong-log-empty{font-size:12px;color:var(--muted);text-align:center;padding:12px 0;}
+.wrong-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--red-light);border-radius:var(--r-sm);margin-bottom:5px;}
+.wrong-item-en{font-size:13px;font-weight:600;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wrong-item-zh{font-size:11px;color:var(--muted);white-space:nowrap;}
+.wrong-item-cnt{font-size:10px;font-weight:700;color:var(--red);background:white;border-radius:99px;padding:1px 6px;flex-shrink:0;}
 
 /* ── Phonetic / IPA ── */
 .detail-phonetic{font-size:16px;color:var(--muted);font-weight:400;margin-bottom:6px;letter-spacing:0.3px;}
@@ -621,6 +633,17 @@ body{
             <div class="cal-weekdays"><div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div><div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div><div class="cal-weekday">六</div></div>
             <div class="cal-grid" id="cal-grid"></div>
             <div class="cal-note" id="cal-note"></div>
+          </div>
+          <!-- Wrong answers log -->
+          <div class="wrong-log-wrap" id="wrong-log-wrap">
+            <div class="wrong-log-header">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="wrong-log-title">錯題紀錄</div>
+                <div class="wrong-log-count" id="wrong-log-count" style="display:none"></div>
+              </div>
+              <button class="wrong-log-clear" onclick="clearWrongLog()">清除全部</button>
+            </div>
+            <div id="wrong-log-list"></div>
           </div>
         </div>
       </div>
@@ -869,6 +892,7 @@ function switchQuiz(){
   endQuiz();
   // Init calendar immediately
   calVY=undefined;calVM=undefined;renderCal();
+  renderWrongLog();
 }
 
 // ── Detail swipe state ──
@@ -1191,12 +1215,81 @@ function allItems(){
 };;
 function startQuiz(){const a=allItems();if(a.length<2){showToast('至少需要 2 筆學習內容');return;}qd=document.getElementById('quiz-direction').value;qt=document.getElementById('quiz-type').value;const cv=document.getElementById('quiz-count').value;const mx=cv==='all'?a.length:parseInt(cv);qi=[...a].sort(()=>Math.random()-0.5).slice(0,Math.min(mx,a.length));qx=0;qs=0;qr=[];document.getElementById('quiz-setup-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-active-area').style.display='block';renderQP();showQ();}
 function renderQP(){document.getElementById('quiz-progress').innerHTML=qi.map((_,i)=>`<div class="progress-dot ${i<qx?'done':i===qx?'current':''}"></div>`).join('');}
-function showQ(){ans=false;const item=qi[qx];document.getElementById('quiz-counter').textContent=`第 ${qx+1} 題 / ${qi.length}`;const ic=qt==='mixed'?Math.random()>0.5:qt==='choice';document.getElementById('quiz-prompt').textContent=qd==='en2zh'?'這個英文的中文意思是？':'這個中文對應的英文是？';document.getElementById('quiz-word').textContent=qd==='en2zh'?item.en:item.zh;document.getElementById('quiz-hint').textContent=qd==='en2zh'&&item.pos?item.pos:'';document.getElementById('quiz-feedback').style.display='none';document.getElementById('btn-next').style.display='none';const area=document.getElementById('quiz-answer-area');if(ic){const opts=[...allItems().filter(i=>i.id!==item.id).sort(()=>Math.random()-0.5).slice(0,3),item].sort(()=>Math.random()-0.5);area.innerHTML=`<div class="quiz-options">${opts.map(o=>`<button class="quiz-option" onclick="checkC(this,'${o.id}','${item.id}')">${esc(qd==='en2zh'?o.zh:o.en)}</button>`).join('')}</div>`;}else{area.innerHTML=`<input class="fill-input" id="fill-input" placeholder="${qd==='en2zh'?'輸入中文意思...':'輸入英文...'}" onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>`;setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);}}
+// Build fill-in-the-blank sentence from stored examples
+function buildFillSentence(item){
+  const exs=(item.examples||[]).filter(s=>s&&s.trim());
+  const answer=item.en;
+  if(!exs.length||!answer)return null;
+  const re=new RegExp(answer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  let chosen=exs.find(s=>re.test(s))||exs[Math.floor(Math.random()*exs.length)];
+  const blanked=chosen.replace(new RegExp(answer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),'_____');
+  return{sentence:blanked,answer};
+}
+function showQ(){
+  ans=false;
+  const item=qi[qx];
+  document.getElementById('quiz-counter').textContent=`第 ${qx+1} 題 / ${qi.length}`;
+  const ic=qt==='mixed'?Math.random()>0.5:qt==='choice';
+  document.getElementById('quiz-feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  const area=document.getElementById('quiz-answer-area');
+  if(ic){
+    document.getElementById('quiz-prompt').textContent=qd==='en2zh'?'這個英文的中文意思是？':'這個中文對應的英文是？';
+    document.getElementById('quiz-word').textContent=qd==='en2zh'?item.en:item.zh;
+    document.getElementById('quiz-hint').textContent=qd==='en2zh'&&item.pos?item.pos:'';
+    const opts=[...allItems().filter(i=>i.id!==item.id).sort(()=>Math.random()-0.5).slice(0,3),item].sort(()=>Math.random()-0.5);
+    area.innerHTML=`<div class="quiz-options">${opts.map(o=>`<button class="quiz-option" onclick="checkC(this,'${o.id}','${item.id}')">${esc(qd==='en2zh'?o.zh:o.en)}</button>`).join('')}</div>`;
+  } else {
+    const fill=buildFillSentence(item);
+    if(fill){
+      document.getElementById('quiz-prompt').textContent='填入空格中缺少的單字 / 片語';
+      document.getElementById('quiz-word').textContent=fill.sentence;
+      document.getElementById('quiz-hint').textContent=item.zh?(item.pos?item.pos+'  '+item.zh:item.zh):'';
+    } else {
+      document.getElementById('quiz-prompt').textContent='這個英文的中文意思是？';
+      document.getElementById('quiz-word').textContent=item.en;
+      document.getElementById('quiz-hint').textContent=item.pos||'';
+    }
+    area.innerHTML='<input class="fill-input" id="fill-input" placeholder="輸入英文單字 / 片語..." onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>';
+    setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);
+  }
+}
 function checkC(btn,oid,cid){if(ans)return;ans=true;const ok=oid===cid;document.querySelectorAll('.quiz-option').forEach(b=>b.disabled=true);btn.classList.add(ok?'correct':'wrong');if(!ok){const cl=qd==='en2zh'?qi[qx].zh:qi[qx].en;document.querySelectorAll('.quiz-option').forEach(b=>{if(b.textContent===cl)b.classList.add('correct');});}showFB(ok,qi[qx]);}
-function checkF(){if(ans)return;const inp=document.getElementById('fill-input');if(!inp)return;ans=true;const ua=inp.value.trim().toLowerCase();const item=qi[qx];const cor=(qd==='en2zh'?item.zh:item.en).toLowerCase();const ok=ua===cor||(cor.includes(ua)&&ua.length>2);inp.classList.add(ok?'correct':'wrong');inp.disabled=true;showFB(ok,item);}
-function showFB(ok,item){if(ok)qs++;qr.push({item,correct:ok});const fb=document.getElementById('quiz-feedback');fb.style.display='block';fb.className='quiz-feedback '+(ok?'correct':'wrong');fb.textContent=ok?'答對了！':`正確答案：${qd==='en2zh'?item.zh:item.en}`;const bn=document.getElementById('btn-next');bn.style.display='block';bn.textContent=qx<qi.length-1?'下一題 →':'查看結果 →';}
+function checkF(){if(ans)return;const inp=document.getElementById('fill-input');if(!inp)return;ans=true;const ua=inp.value.trim().toLowerCase();const item=qi[qx];const cor=item.en.toLowerCase();const ok=ua===cor||(cor.includes(ua)&&ua.length>2)||(ua.includes(cor)&&cor.length>2);inp.classList.add(ok?'correct':'wrong');inp.disabled=true;showFB(ok,item);}
+function showFB(ok,item){if(ok)qs++;qr.push({item,correct:ok});if(!ok)recordWrong(item);const fb=document.getElementById('quiz-feedback');fb.style.display='block';fb.className='quiz-feedback '+(ok?'correct':'wrong');fb.textContent=ok?'答對了！':'正確答案：'+item.en+(item.zh?' ('+item.zh+')':'');const bn=document.getElementById('btn-next');bn.style.display='block';bn.textContent=qx<qi.length-1?'下一題 →':'查看結果 →';}
 function nextQuestion(){qx++;if(qx>=qi.length)showResult();else{renderQP();showQ();}}
-function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:13px;font-weight:600;color:${r.correct?'var(--green-dark)':'var(--red)'}">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();renderCal();}
+function showResult(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='block';const tot=qi.length;document.getElementById('result-score-num').textContent=qs;document.getElementById('result-score-total').textContent='/ '+tot;const pct=Math.round(qs/tot*100);const[lb,sb]=pct===100?['完美！全對！','你已完全掌握這些內容']:pct>=80?['非常好！',`答對 ${pct}%`]:pct>=60?['繼續加油！',`答對 ${pct}%`]:['需要多練習',`答對 ${pct}%`];document.getElementById('result-label').textContent=lb;document.getElementById('result-sub').textContent=sb;document.getElementById('result-list').innerHTML=qr.map(r=>`<div class="result-row ${r.correct?'ok':'fail'}"><span style="font-size:13px;font-weight:600;color:${r.correct?'var(--green-dark)':'var(--red)'}">${r.correct?'✓':'✕'}</span><span style="font-size:14px;font-weight:500;flex:1">${esc(r.item.en)}</span><span style="font-size:12px;color:var(--muted)">${esc(r.item.zh)}</span></div>`).join('');if(qs===tot)recordCheckin();renderCal();renderWrongLog();}
+
+// ── Wrong Answers Log ──
+function recordWrong(item){
+  if(!window._d.wrongLog)window._d.wrongLog={};
+  const k=item.id;
+  if(window._d.wrongLog[k]){
+    window._d.wrongLog[k].count=(window._d.wrongLog[k].count||1)+1;
+    window._d.wrongLog[k].lastTs=Date.now();
+  } else {
+    window._d.wrongLog[k]={en:item.en,zh:item.zh||'',count:1,lastTs:Date.now()};
+  }
+  save();
+}
+function renderWrongLog(){
+  const log=window._d.wrongLog||{};
+  const entries=Object.values(log).sort((a,b)=>b.count-a.count||b.lastTs-a.lastTs);
+  const listEl=document.getElementById('wrong-log-list');
+  const countEl=document.getElementById('wrong-log-count');
+  if(!listEl)return;
+  if(!entries.length){
+    listEl.innerHTML='<div class="wrong-log-empty">尚無錯題紀錄</div>';
+    if(countEl)countEl.style.display='none';
+    return;
+  }
+  if(countEl){countEl.textContent=entries.length+' 題';countEl.style.display='inline-flex';}
+  listEl.innerHTML=entries.map(e=>`<div class="wrong-item"><span class="wrong-item-en">${esc(e.en)}</span><span class="wrong-item-zh">${esc(e.zh)}</span><span class="wrong-item-cnt">×${e.count}</span></div>`).join('');
+}
+function clearWrongLog(){
+  if(!confirm('確定清除所有錯題紀錄？'))return;
+  window._d.wrongLog={};save();renderWrongLog();showToast('已清除錯題紀錄');
+}
 
 // ── Calendar ──
 let calVY,calVM;
@@ -1230,7 +1323,7 @@ function renderCal(){
 }
 function calPrev(){if(calVM===undefined)return;calVM--;if(calVM<0){calVM=11;calVY--;}renderCal();}
 function calNext(){if(calVM===undefined)return;const now=new Date();if(calVY===now.getFullYear()&&calVM===now.getMonth())return;calVM++;if(calVM>11){calVM=0;calVY++;}renderCal();}
-function endQuiz(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-setup-area').style.display='block';renderCal();}
+function endQuiz(){document.getElementById('quiz-active-area').style.display='none';document.getElementById('quiz-result-area').style.display='none';document.getElementById('quiz-setup-area').style.display='block';renderCal();renderWrongLog();}
 
 // ── PWA ──
 let dp=null;
