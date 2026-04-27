@@ -1250,7 +1250,7 @@ function showQ(){
       document.getElementById('quiz-word').textContent=item.en;
       document.getElementById('quiz-hint').textContent=item.pos||'';
     }
-    area.innerHTML='<input class="fill-input" id="fill-input" placeholder="輸入英文單字 / 片語..." onkeydown="if(event.key==='Enter')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>';
+    area.innerHTML='<input class="fill-input" id="fill-input" placeholder="輸入英文單字 / 片語..." onkeydown="if(event.key===\'Enter\')checkF()"><button class="btn-next" style="display:block;margin-bottom:8px" onclick="checkF()">確認答案</button>';
     setTimeout(()=>{const el=document.getElementById('fill-input');if(el)el.focus();},100);
   }
 }
