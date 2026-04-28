@@ -1340,12 +1340,29 @@ const PRESET_TAGS=['旅遊','商業','學術','日常','科技','食物','情感
 let selectedTags=[];
 let filterTag='';
 
+function getAllCustomTags(){
+  // Collect all tags used across all content types, excluding presets
+  const all=Object.values(window._d||{})
+    .filter(v=>Array.isArray(v))
+    .flatMap(arr=>arr.flatMap(i=>Array.isArray(i.tags)?i.tags:[]))
+    .filter(tg=>!PRESET_TAGS.includes(tg));
+  return[...new Set(all)].sort();
+}
+
 function renderTagsUI(){
   const presetWrap=document.getElementById('preset-tags-wrap');
   const selWrap=document.getElementById('selected-tags-wrap');
   if(!presetWrap||!selWrap)return;
+  const customSaved=getAllCustomTags();
+  // Preset tags row
   presetWrap.innerHTML=PRESET_TAGS.map(tg=>`<span class="preset-tag${selectedTags.includes(tg)?' selected':''}" onclick="togglePresetTag('${tg}')">${tg}</span>`).join('');
-  selWrap.innerHTML=selectedTags.filter(tg=>!PRESET_TAGS.includes(tg)).map(tg=>`<span class="tag-chip">${esc(tg)}<span class="tag-del" onclick="removeTag(this,'${esc(tg)}')">×</span></span>`).join('');
+  // Saved custom tags (clickable like presets)
+  if(customSaved.length){
+    presetWrap.innerHTML+=customSaved.map(tg=>`<span class="preset-tag${selectedTags.includes(tg)?' selected':''}" onclick="togglePresetTag('${esc(tg)}')">${esc(tg)}</span>`).join('');
+  }
+  // Currently selected custom tags not yet saved (new ones added this session)
+  const newUnsaved=selectedTags.filter(tg=>!PRESET_TAGS.includes(tg)&&!customSaved.includes(tg));
+  selWrap.innerHTML=newUnsaved.map(tg=>`<span class="tag-chip">${esc(tg)}<span class="tag-del" onclick="removeTag(this,'${esc(tg)}')">×</span></span>`).join('');
 }
 function togglePresetTag(tg){
   if(selectedTags.includes(tg))selectedTags=selectedTags.filter(x=>x!==tg);
