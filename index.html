@@ -221,14 +221,15 @@ body{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,0.32);
   z-index:200;
-  align-items:flex-end;justify-content:center;
+  align-items:center;justify-content:center;
+  padding:16px;
 }
 .overlay.open{display:flex;}
 .modal{
   background:var(--bg);
-  border-radius:18px 18px 0 0;
-  width:100%;max-width:430px;
-  max-height:72vh;
+  border-radius:18px;
+  width:100%;max-width:400px;
+  max-height:calc(100vh - 32px - var(--safe-top) - var(--safe-bottom));
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding-bottom:calc(10px + var(--safe-bottom));
@@ -549,6 +550,12 @@ body{
 <body>
 
 <!-- Login -->
+<script>
+// 若上次已登入，立即隱藏登入畫面，避免 PWA 開啟時閃現
+if(localStorage.getItem('wv_auth')==='1'){
+  document.write('<style id="wv-auth-hide">#login-screen{display:none!important}</style>');
+}
+</script>
 <div id="login-screen">
   <div class="login-logo">WordVault</div>
   <div class="login-sub-logo">你的個人英文學習本</div>
@@ -801,9 +808,9 @@ let app,auth,db,user=null,unsub=null;
 if(!DEMO){app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,u=>{if(u){user=u;hideLogo();setupSync(u);}});}
 window.loginGoogle=async function(){if(DEMO){loginGuest();return;}try{await signInWithPopup(auth,new GoogleAuthProvider());}catch{showToast('登入失敗');}};
 window.loginGuest=function(){hideLogo();loadLocal();};
-window.logoutUser=async function(){if(!DEMO&&auth){if(unsub)unsub();await signOut(auth);}user=null;document.getElementById('login-screen').style.display='flex';};
+window.logoutUser=async function(){if(!DEMO&&auth){if(unsub)unsub();await signOut(auth);}user=null;try{localStorage.removeItem('wv_auth');}catch(e){}const hs=document.getElementById('wv-auth-hide');if(hs)hs.remove();document.getElementById('login-screen').style.display='flex';};
 window.showUserMenu=function(){if(confirm('登出？'))logoutUser();};
-function hideLogo(){document.getElementById('login-screen').style.display='none';}
+function hideLogo(){try{localStorage.setItem('wv_auth','1');}catch(e){}document.getElementById('login-screen').style.display='none';}
 function setupSync(u){
   if(DEMO){loadLocal();return;}
   const ref=doc(db,'users',u.uid,'app','data');
