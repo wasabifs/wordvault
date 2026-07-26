@@ -230,22 +230,27 @@ body{
   border-radius:18px;
   width:100%;max-width:400px;
   max-height:calc(100vh - 32px - var(--safe-top) - var(--safe-bottom));
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  padding-bottom:calc(10px + var(--safe-bottom));
-  overscroll-behavior:contain;
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
-.modal-handle{width:32px;height:4px;background:#d1d1d6;border-radius:2px;margin:10px auto 0;}
-.modal-header{padding:12px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.modal-handle{width:32px;height:4px;background:#d1d1d6;border-radius:2px;margin:8px auto 0;flex-shrink:0;}
+.modal-header{padding:8px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;}
 .modal-title{font-size:16px;font-weight:700;color:var(--ink);}
 .modal-close{width:26px;height:26px;border-radius:99px;background:var(--faint);border:none;cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:600;}
-.modal-body{padding:0 14px;}
+.modal-body{
+  padding:0 14px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  flex:1 1 auto;
+  min-height:0;
+}
 
 /* Form */
-.field{margin-bottom:10px;}
-.field-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.field{margin-bottom:7px;}
+.field-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;}
 .field-input,.field-textarea{
-  width:100%;padding:10px 12px;
+  width:100%;padding:8px 11px;
   border:none;border-radius:var(--r-sm);
   font-size:15px;color:var(--ink);
   font-family:'Inter',sans-serif;
@@ -254,22 +259,22 @@ body{
   -webkit-appearance:none;
 }
 .field-input:focus,.field-textarea:focus{box-shadow:0 0 0 2px var(--accent);}
-.field-textarea{resize:none;line-height:1.5;}
+.field-textarea{resize:none;line-height:1.4;}
 .field-input::placeholder,.field-textarea::placeholder{color:#c7c7cc;}
 
 /* Translate button row */
-.trans-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px;}
+.trans-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:6px;}
 .trans-row .field{flex:1;margin-bottom:0;}
 .btn-translate{
   flex-shrink:0;
-  padding:10px 14px;
+  padding:8px 13px;
   border-radius:var(--r-sm);
   background:var(--accent);
   color:white;font-size:13px;font-weight:600;
   border:none;cursor:pointer;
   font-family:'Inter',sans-serif;
   white-space:nowrap;
-  height:40px;
+  height:36px;
   display:flex;align-items:center;gap:5px;
 }
 .btn-translate:disabled{background:var(--border);color:var(--muted);cursor:default;}
@@ -277,22 +282,28 @@ body{
 .spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
+.dup-hint{
+  font-size:12px;color:var(--red);background:var(--red-light);
+  padding:6px 10px;border-radius:var(--r-sm);
+  margin:-3px 0 6px;display:none;line-height:1.4;
+}
+
 .trans-result{
-  padding:8px 12px;border-radius:var(--r-sm);
+  padding:7px 11px;border-radius:var(--r-sm);
   background:var(--accent-light);
   font-size:12px;color:var(--accent);
-  margin-bottom:10px;
+  margin-bottom:6px;
   display:none;
 }
 
 .pos-picker{display:flex;gap:6px;flex-wrap:wrap;}
-.pos-tag{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);}
+.pos-tag{padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);}
 .pos-tag.active{background:var(--accent);color:white;border-color:var(--accent);}
-.example-group{display:flex;flex-direction:column;gap:6px;}
+.example-group{display:flex;flex-direction:column;gap:5px;}
 .example-row{display:flex;gap:6px;align-items:flex-start;}
-.example-num{font-size:11px;font-weight:700;color:var(--muted);padding-top:11px;min-width:12px;}
+.example-num{font-size:11px;font-weight:700;color:var(--muted);padding-top:9px;min-width:12px;}
 
-.btn-row{display:flex;gap:8px;padding:10px 14px 0;}
+.btn-row{display:flex;gap:8px;padding:8px 14px calc(8px + var(--safe-bottom));flex-shrink:0;background:var(--bg);border-top:0.5px solid var(--border);}
 .btn-primary{flex:1;padding:12px;border-radius:var(--r);background:var(--accent);color:white;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-danger{padding:12px 16px;border-radius:var(--r);background:var(--red-light);color:var(--red);font-size:15px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
 
@@ -736,13 +747,14 @@ if(localStorage.getItem('wv_auth')==='1'){
       <div class="field-label">英文</div>
       <div class="trans-row">
         <div class="field">
-          <input class="field-input" id="input-en" placeholder="輸入英文單字...">
+          <input class="field-input" id="input-en" placeholder="輸入英文單字..." oninput="checkDuplicate()" onblur="checkDuplicate()">
         </div>
         <button class="btn-translate" id="btn-translate" onclick="doTranslate()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
           翻譯
         </button>
       </div>
+      <div class="dup-hint" id="dup-hint"></div>
       <div class="trans-result" id="trans-result"></div>
 
       <div class="field"><div class="field-label">中文翻譯</div><input class="field-input" id="input-zh" placeholder="翻譯後自動填入，可修改..."></div>
@@ -1039,6 +1051,7 @@ function openAddModal(){
   ['input-en','input-zh','input-syn','input-ant','input-note','input-phonetic','input-tense-past','input-tense-pp','input-tense-ing','input-tense-3sg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('trans-result').style.display='none';
   document.getElementById('trans-result').textContent='';
+  document.getElementById('dup-hint').style.display='none';
   document.getElementById('modal-del-btn').style.display='none';
   document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
@@ -1057,6 +1070,7 @@ function openEditModal(t,id){
   document.getElementById('input-syn').value=item.syn||'';
   document.getElementById('input-ant').value=item.ant||'';
   document.getElementById('input-note').value=item.note||'';
+  document.getElementById('dup-hint').style.display='none';
   // New fields
   if(document.getElementById('input-phonetic'))document.getElementById('input-phonetic').value=item.phonetic||'';
   if(document.getElementById('input-tense-past'))document.getElementById('input-tense-past').value=item.tense?.past||'';
@@ -1097,6 +1111,23 @@ function clearEx(){['vocab-examples','phrase-examples'].forEach(g=>document.quer
 function fillEx(t,arr){const g=t==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((r,i)=>r.value=arr[i]||'');}
 function getEx(t){const g=t==='phrase'?'phrase-examples':'vocab-examples';return Array.from(document.querySelectorAll(`#${g} textarea`)).map(r=>r.value.trim()).filter(Boolean);}
 function closeOverlay(e){if(e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('open');}
+
+// ── Duplicate word check ──
+function checkDuplicate(){
+  const hint=document.getElementById('dup-hint');
+  const en=document.getElementById('input-en').value.trim().toLowerCase();
+  if(!hint)return null;
+  if(!en){hint.style.display='none';return null;}
+  const arr=window._d[etab]||[];
+  const dup=arr.find(x=>x.id!==eid&&(x.en||'').trim().toLowerCase()===en);
+  if(dup){
+    hint.textContent=`⚠️ 「${dup.en}」已存在${dup.zh?'（'+dup.zh+'）':''}，儲存後將產生重複項目`;
+    hint.style.display='block';
+  }else{
+    hint.style.display='none';
+  }
+  return dup;
+}
 function tl(t){return{vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'}[t]||'';}
 
 // ── Manual translate button ──
@@ -1184,6 +1215,8 @@ function saveEntry(){
   const en=document.getElementById('input-en').value.trim();
   const zh=document.getElementById('input-zh').value.trim();
   if(!en){showToast('請輸入英文內容');return;}
+  const dup=checkDuplicate();
+  if(dup&&!confirm(`「${en}」已存在${dup.zh?'（'+dup.zh+'）':''}，確定要新增重複項目嗎？`))return;
   const posEl=document.querySelector('.pos-tag.active');
   const pos=posEl?posEl.textContent:'';
   const syn=document.getElementById('input-syn').value.trim();
