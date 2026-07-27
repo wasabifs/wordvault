@@ -259,7 +259,7 @@ body{
   -webkit-appearance:none;
 }
 .field-input:focus,.field-textarea:focus{box-shadow:0 0 0 2px var(--accent);}
-.field-textarea{resize:none;line-height:1.4;}
+.field-textarea{resize:none;line-height:1.4;overflow:hidden;min-height:38px;}
 .field-input::placeholder,.field-textarea::placeholder{color:#c7c7cc;}
 
 /* Translate button row */
@@ -287,6 +287,16 @@ body{
   padding:6px 10px;border-radius:var(--r-sm);
   margin:-3px 0 6px;display:none;line-height:1.4;
 }
+
+.adv-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 11px;margin-bottom:7px;
+  background:var(--faint);border-radius:var(--r-sm);
+  font-size:12px;font-weight:600;color:var(--accent);
+  cursor:pointer;
+}
+#adv-chevron{display:inline-block;transition:transform 0.15s;font-size:11px;}
+#adv-chevron.open{transform:rotate(180deg);}
 
 .trans-result{
   padding:7px 11px;border-radius:var(--r-sm);
@@ -761,31 +771,37 @@ if(localStorage.getItem('wv_auth')==='1'){
       <div class="field" id="pos-field"><div class="field-label">詞性</div><div class="pos-picker"><span class="pos-tag" onclick="pickPos(this)">n.</span><span class="pos-tag" onclick="pickPos(this)">v.</span><span class="pos-tag" onclick="pickPos(this)">adj.</span><span class="pos-tag" onclick="pickPos(this)">adv.</span><span class="pos-tag" onclick="pickPos(this)">phr.</span><span class="pos-tag" onclick="pickPos(this)">其他</span></div></div>
 
       <div id="vocab-extra">
-        <div class="field"><div class="field-label">音標（IPA）</div><input class="field-input" id="input-phonetic" placeholder="翻譯後自動填入，e.g. /rɪˈzɪliəns/"></div>
-        <div class="field" id="tense-field"><div class="field-label">動詞時態（v. 時自動填入）</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <input class="field-input" id="input-tense-past" placeholder="過去式">
-            <input class="field-input" id="input-tense-pp" placeholder="過去分詞">
-            <input class="field-input" id="input-tense-ing" placeholder="現在分詞">
-            <input class="field-input" id="input-tense-3sg" placeholder="第三人稱單數">
-          </div>
+        <div class="adv-toggle" id="adv-toggle" onclick="toggleAdvanced()">
+          <span>進階欄位（音標／同義詞／反義詞／時態）</span>
+          <span id="adv-chevron">▾</span>
         </div>
-        <div class="field"><div class="field-label">同義詞（逗號分隔）</div><input class="field-input" id="input-syn" placeholder="e.g. strong, tough"></div>
-        <div class="field"><div class="field-label">反義詞（逗號分隔）</div><input class="field-input" id="input-ant" placeholder="e.g. fragile, weak"></div>
+        <div id="vocab-advanced" style="display:none">
+          <div class="field"><div class="field-label">音標（IPA）</div><input class="field-input" id="input-phonetic" placeholder="翻譯後自動填入，e.g. /rɪˈzɪliəns/"></div>
+          <div class="field" id="tense-field"><div class="field-label">動詞時態（v. 時自動填入）</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input class="field-input" id="input-tense-past" placeholder="過去式">
+              <input class="field-input" id="input-tense-pp" placeholder="過去分詞">
+              <input class="field-input" id="input-tense-ing" placeholder="現在分詞">
+              <input class="field-input" id="input-tense-3sg" placeholder="第三人稱單數">
+            </div>
+          </div>
+          <div class="field"><div class="field-label">同義詞（逗號分隔）</div><input class="field-input" id="input-syn" placeholder="e.g. strong, tough"></div>
+          <div class="field"><div class="field-label">反義詞（逗號分隔）</div><input class="field-input" id="input-ant" placeholder="e.g. fragile, weak"></div>
+        </div>
         <div class="field"><div class="field-label">例句（至少三則）</div>
           <div class="example-group" id="vocab-examples">
-            <div class="example-row"><span class="example-num">1</span><textarea class="field-textarea" rows="2" placeholder="第一則例句..."></textarea></div>
-            <div class="example-row"><span class="example-num">2</span><textarea class="field-textarea" rows="2" placeholder="第二則例句..."></textarea></div>
-            <div class="example-row"><span class="example-num">3</span><textarea class="field-textarea" rows="2" placeholder="第三則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">1</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第一則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">2</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第二則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">3</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第三則例句..."></textarea></div>
           </div>
         </div>
       </div>
       <div id="phrase-extra" style="display:none">
         <div class="field"><div class="field-label">例句（至少三則）</div>
           <div class="example-group" id="phrase-examples">
-            <div class="example-row"><span class="example-num">1</span><textarea class="field-textarea" rows="2" placeholder="第一則例句..."></textarea></div>
-            <div class="example-row"><span class="example-num">2</span><textarea class="field-textarea" rows="2" placeholder="第二則例句..."></textarea></div>
-            <div class="example-row"><span class="example-num">3</span><textarea class="field-textarea" rows="2" placeholder="第三則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">1</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第一則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">2</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第二則例句..."></textarea></div>
+            <div class="example-row"><span class="example-num">3</span><textarea class="field-textarea" rows="1" oninput="autoGrow(this)" placeholder="第三則例句..."></textarea></div>
           </div>
         </div>
       </div>
@@ -797,7 +813,7 @@ if(localStorage.getItem('wv_auth')==='1'){
           <button onclick="addCustomTag()">新增</button>
         </div>
       </div>
-      <div class="field"><div class="field-label">個人筆記（選填）</div><textarea class="field-textarea" id="input-note" rows="2" placeholder="在哪裡看到？有什麼聯想？..."></textarea></div>
+      <div class="field"><div class="field-label">個人筆記（選填）</div><textarea class="field-textarea" id="input-note" rows="1" oninput="autoGrow(this)" placeholder="在哪裡看到？有什麼聯想？..."></textarea></div>
       <div class="field"><div class="field-label">熟悉度</div><div class="fam-picker"><span class="fam-tag" onclick="pickFam(this,'unknown')">陌生</span><span class="fam-tag" onclick="pickFam(this,'known')">認識</span><span class="fam-tag" onclick="pickFam(this,'mastered')">熟悉</span></div></div>
     </div>
     <div class="btn-row">
@@ -1057,6 +1073,8 @@ function openAddModal(){
   document.querySelectorAll('.fam-tag').forEach(t=>{t.className='fam-tag';});
   selectedTags=[];renderTagsUI();
   setModalMode(tab);clearEx();
+  collapseAdvanced();
+  document.querySelectorAll('.field-textarea').forEach(autoGrow);
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('input-en').focus(),350);
 }
@@ -1089,6 +1107,8 @@ function openEditModal(t,id){
   setModalMode(t);
   const exArr=Array.isArray(item.examples)?item.examples:(item.example?[item.example]:[]);
   fillEx(t,exArr);
+  if(item.phonetic||item.syn||item.ant||item.tense?.past||item.tense?.pp||item.tense?.ing||item.tense?.sg3){showAdvanced();}else{collapseAdvanced();}
+  document.querySelectorAll('.field-textarea').forEach(autoGrow);
   document.getElementById('overlay').classList.add('open');
 }
 
@@ -1105,10 +1125,38 @@ function pickPos(el){
   document.querySelectorAll('.pos-tag').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   const tf=document.getElementById('tense-field');
-  if(tf&&etab==='vocab')tf.style.display=el.textContent==='v.'?'block':'none';
+  if(tf&&etab==='vocab'){
+    const isVerb=el.textContent==='v.';
+    tf.style.display=isVerb?'block':'none';
+    if(isVerb)showAdvanced();
+  }
 }
-function clearEx(){['vocab-examples','phrase-examples'].forEach(g=>document.querySelectorAll(`#${g} textarea`).forEach(r=>r.value=''));}
-function fillEx(t,arr){const g=t==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((r,i)=>r.value=arr[i]||'');}
+function clearEx(){['vocab-examples','phrase-examples'].forEach(g=>document.querySelectorAll(`#${g} textarea`).forEach(r=>{r.value='';autoGrow(r);}));}
+
+// ── Collapsible advanced fields (phonetic/tense/synonym/antonym) ──
+function toggleAdvanced(){
+  const box=document.getElementById('vocab-advanced');
+  if(!box)return;
+  if(box.style.display==='none')showAdvanced();else collapseAdvanced();
+}
+function showAdvanced(){
+  const box=document.getElementById('vocab-advanced');
+  if(box)box.style.display='block';
+  document.getElementById('adv-chevron')?.classList.add('open');
+}
+function collapseAdvanced(){
+  const box=document.getElementById('vocab-advanced');
+  if(box)box.style.display='none';
+  document.getElementById('adv-chevron')?.classList.remove('open');
+}
+
+// ── Auto-growing textareas so example/note boxes start compact ──
+function autoGrow(el){
+  if(!el)return;
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
+function fillEx(t,arr){const g=t==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((r,i)=>{r.value=arr[i]||'';autoGrow(r);});}
 function getEx(t){const g=t==='phrase'?'phrase-examples':'vocab-examples';return Array.from(document.querySelectorAll(`#${g} textarea`)).map(r=>r.value.trim()).filter(Boolean);}
 function closeOverlay(e){if(e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('open');}
 
@@ -1193,7 +1241,7 @@ function applyTrans(r){
   if(r.pos)document.querySelectorAll('.pos-tag').forEach(t=>{if(t.textContent===r.pos){t.classList.add('active');const tf=document.getElementById('tense-field');if(tf&&etab==='vocab')tf.style.display=r.pos==='v.'?'block':'none';}});
   if(r.syn&&!document.getElementById('input-syn').value)document.getElementById('input-syn').value=r.syn;
   if(r.ant&&!document.getElementById('input-ant').value)document.getElementById('input-ant').value=r.ant;
-  if(r.examples?.length){const g=etab==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((x,i)=>{if(!x.value&&r.examples[i])x.value=r.examples[i];});}
+  if(r.examples?.length){const g=etab==='phrase'?'phrase-examples':'vocab-examples';document.querySelectorAll(`#${g} textarea`).forEach((x,i)=>{if(!x.value&&r.examples[i]){x.value=r.examples[i];autoGrow(x);}});}
   // Phonetic
   const phoEl=document.getElementById('input-phonetic');
   if(phoEl&&!phoEl.value&&r.phonetic)phoEl.value=r.phonetic;
@@ -1204,6 +1252,8 @@ function applyTrans(r){
       if(el&&!el.value&&r.tense[k])el.value=r.tense[k];
     });
   }
+  // Reveal advanced fields automatically once AI has filled any of them, so the user can review
+  if(etab==='vocab'&&(r.phonetic||r.syn||r.ant||r.tense))showAdvanced();
   const filled=[r.zh&&'中文',r.pos&&'詞性',r.phonetic&&'音標',r.syn&&'同義詞',r.ant&&'反義詞',r.examples?.length&&'例句'].filter(Boolean);
   const result=document.getElementById('trans-result');
   result.textContent=`已填入：${filled.join('、')}`;
