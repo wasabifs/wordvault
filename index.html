@@ -101,6 +101,7 @@ body{
 }
 .topbar-title-row{display:flex;align-items:center;margin-bottom:10px;}
 .topbar-title{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;flex:1;}
+.topbar-count{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px;}
 .topbar-back{font-size:15px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;padding:0;}
 
 /* ── Search bar (capsule, always visible) ── */
@@ -139,9 +140,9 @@ body{
 .word-card{
   background:var(--card);
   border-radius:var(--r);
-  padding:10px 10px;
+  padding:8px 10px;
   cursor:pointer;
-  min-height:100px;
+  min-height:72px;
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -149,13 +150,13 @@ body{
 }
 .word-card:active{opacity:0.65;}
 .word-en{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;overflow:hidden;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.word-zh{font-size:11px;color:var(--muted);overflow:hidden;word-break:break-word;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.pos-badge{display:inline-block;font-size:9px;padding:1px 6px;border-radius:99px;font-weight:600;}
-.pos-n{background:var(--accent-light);color:var(--accent);}
-.pos-v{background:var(--green-light);color:var(--green-dark);}
-.pos-adj{background:var(--orange-light);color:var(--orange);}
-.pos-adv{background:var(--teal-light);color:#0a84ff;}
-.pos-phr,.pos-other{background:var(--faint);color:var(--muted);}
+.word-zh{font-size:11px;color:var(--muted);overflow:hidden;word-break:break-word;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.pos-badge{display:inline-block;font-size:9px;padding:0;border-radius:0;font-weight:600;background:none!important;}
+.pos-n{color:var(--accent);}
+.pos-v{color:var(--green-dark);}
+.pos-adj{color:var(--orange);}
+.pos-adv{color:#0a84ff;}
+.pos-phr,.pos-other{color:var(--muted);}
 
 /* ── Single-col list ── */
 .word-list{display:flex;flex-direction:column;gap:7px;}
@@ -609,6 +610,7 @@ if(localStorage.getItem('wv_auth')==='1'){
   <div class="topbar" id="main-topbar">
     <div class="topbar-title-row">
       <span class="topbar-title" id="page-title">單字</span>
+      <span class="topbar-count" id="page-title-count"></span>
     </div>
     <div class="search-bar" id="search-bar">
       <div class="search-icon">
@@ -930,6 +932,8 @@ function switchQuiz(){
   document.getElementById('page-detail').style.display='none';
   ['vocab','phrase','grammar','pattern','quiz'].forEach(x=>{const tb=document.getElementById('tab-'+x);if(tb)tb.classList.toggle('active',x==='quiz');});
   document.getElementById('page-title').textContent='測驗';
+  const titleCount=document.getElementById('page-title-count');
+  if(titleCount)titleCount.textContent='';
   document.getElementById('fab').style.display='none';
   document.getElementById('search-bar').style.display='none';
   document.getElementById('filter-tabs').style.display='none';
@@ -1018,7 +1022,7 @@ function detailNext(){if(_detailIndex<_detailList.length-1){_detailIndex++;_show
 function goHome(){
   const titleRow=document.querySelector('.topbar-title-row');
   const lb={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
-  titleRow.innerHTML=`<span class="topbar-title" id="page-title">${lb[tab]||'WordVault'}</span>`;
+  titleRow.innerHTML=`<span class="topbar-title" id="page-title">${lb[tab]||'WordVault'}</span><span class="topbar-count" id="page-title-count"></span>`;
   document.getElementById('filter-tabs').style.display='flex';
   document.getElementById('tag-filter-row').style.display='';
   switchTab(tab,lb[tab]);
@@ -1527,12 +1531,18 @@ function fallbackTTS(word){
 
 // ── Tab count badges ──
 function updateTabCounts(){
+  const unit={vocab:'單字',phrase:'片語',grammar:'文法',pattern:'句型'};
   ['vocab','phrase','grammar','pattern'].forEach(t=>{
     const count=(window._d[t]||[]).length;
     const badge=document.getElementById('badge-'+t);
-    if(!badge)return;
-    if(count>0){badge.textContent=count>99?'99+':count;badge.classList.add('visible');}
-    else{badge.textContent='';badge.classList.remove('visible');}
+    if(badge){
+      if(count>0){badge.textContent=count>99?'99+':count;badge.classList.add('visible');}
+      else{badge.textContent='';badge.classList.remove('visible');}
+    }
+    if(t===tab){
+      const titleCount=document.getElementById('page-title-count');
+      if(titleCount)titleCount.textContent=count>0?`共 ${count} 個${unit[t]}`:'';
+    }
   });
 }
 
